@@ -23,6 +23,8 @@ Board::Board(QWidget* parent):QWidget(parent)
         qWarning("Failed to load case.png");
     }
 
+    list<PawnLabel*>::iterator it;
+
     for(int i=0;i<3;i++)
     {
         for(int j=0;j<3;j++){
@@ -34,6 +36,12 @@ Board::Board(QWidget* parent):QWidget(parent)
             this->board[i][j].setPixmap(case_pixmap);
             this->board[i][j].move(x,y);
             connect(&(this->board[i][j]), SIGNAL(caseClicked(Case*) ), this, SLOT( movePawns(Case*)));
+
+            for(it = this->board[i][j].pawnList.begin();it != this->board[i][j].pawnList.end() ; it++)
+            {
+                PawnLabel *temp = *it;
+                connect(temp,SIGNAL(deselectOthers(PawnLabel*)),this,SLOT(deselectPawns(PawnLabel*)));
+            }// connexion de toutes les cases au plateau.
         }
     }
 
@@ -60,7 +68,21 @@ Board::Board(QWidget* parent):QWidget(parent)
     this->insertPawn(2,2,new PawnLabel(parent,false));
     this->insertPawn(2,2,new PawnLabel(parent,false));
 
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            for(it = this->board[i][j].pawnList.begin();it != this->board[i][j].pawnList.end() ; it++)
+            {
+                PawnLabel *temp = *it;
+                connect(temp,SIGNAL(deselectOthers(PawnLabel*)),this,SLOT(deselectPawns(PawnLabel*)));
+            }// connexion de toutes les cases au plateau.
+        }
+    }
+
 }
+
+/* Insère un pion dans board[i][j].pawnList, ainsi que graphiquement */
 
 void Board::insertPawn(int i, int j, PawnLabel *p)
 {
@@ -71,6 +93,8 @@ void Board::insertPawn(int i, int j, PawnLabel *p)
     c->pawnList.push_back(p);
     p->move(x,y);
 }
+
+/* Insère un pion dans c.pawnList, ainsi que graphiquement */
 
 void Board::insertPawn(Case* c, PawnLabel *p)
 {
@@ -123,7 +147,7 @@ void Board::movePawns(Case* c)
     qDebug()<<"Case clicked ! Position : " << i << " " << j;
 
     /* On cherche pour toutes les cases, la première qui contient un pion à la caractéristique "selected" à 1. Quand on le trouve, on
-     * prend automatiquement tous les pions qui sont au dessus de lui, sans se soucier de leur statut */
+     * prend automatiquement tous les pions qui sont au dessus de lui dans la liste, sans se soucier de leur statut */
 
     PawnLabel* toMove;
 
@@ -147,6 +171,9 @@ void Board::movePawns(Case* c)
 
             }
         }
+
+        /* On verifie les 3 règles principales : que c'est bien au noir ou au blanc de jouer, qu'il n'y a pas plus de 3 pions pris,
+         * et que la taille du mouvement est aussi grand que le nombre de pions pris */
 
         if(trouve != 0)
         {
@@ -259,8 +286,7 @@ void Board::setToMove(bool b)
     this->isWhiteToMove = b;
 }
 
-// Cette fonction détermine si le dernier de la pile est blanc. Si il n'est pas blanc alors il est
-// noir
+/* Cette fonction détermine si la pile appartient au joueur noir ou au blanc */
 
 bool Board::isStackWhite(list<PawnLabel*> &l)
 {
@@ -272,4 +298,26 @@ bool Board::isStackWhite(list<PawnLabel*> &l)
 
     return lastPawn->getIsWhite();
 
+}
+
+/* Lorsqu'un pion est cliqué, cette fonction désélectionne tous les autres */
+
+void Board::deselectPawns(PawnLabel *p)
+{
+    list<PawnLabel*>::iterator it;
+
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            for(it = this->board[i][j].pawnList.begin();it != this->board[i][j].pawnList.end() ; it++)
+            {
+                PawnLabel *temp = *it;
+                if(temp != p)
+                {
+                    temp->setSelected(false);
+                }
+            }
+        }
+    }
 }

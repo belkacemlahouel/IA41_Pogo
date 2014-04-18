@@ -28,6 +28,7 @@ signals:
 
 public slots:
     void movePawns(Case *c);
+    void deselectPawns(PawnLabel *p);
 
 };
 

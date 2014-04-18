@@ -12,6 +12,8 @@ Q_OBJECT
 private:
     int selected;
     bool isWhite; // S'il n'est pas blanc, il est noir.
+    QPixmap pic;
+    QPixmap selectpic;
 
 public:
     PawnLabel(QWidget * parent = 0 );
@@ -24,6 +26,7 @@ public:
 
 signals:
     void clicked();
+    void deselectOthers(PawnLabel *p);
 
 public slots:
     void pawnClicked();
