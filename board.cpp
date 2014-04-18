@@ -3,6 +3,7 @@
 
 Board::Board(QWidget* parent):QWidget(parent)
 {
+    this->isWhiteToMove = true;
     this->board = new Case*[3];
     for (int i = 0; i < 3; ++i)
             board[i] = new Case[3];
@@ -42,6 +43,8 @@ Board::Board(QWidget* parent):QWidget(parent)
 
     /*PawnLabel* black_label =new PawnLabel(parent,false);
     PawnLabel* white_label =new PawnLabel(parent,true);*/
+
+    qDebug()<<"Insertion des pions";
 
     this->insertPawn(0,0,new PawnLabel(parent,true));
     this->insertPawn(0,0,new PawnLabel(parent,true));
@@ -147,34 +150,42 @@ void Board::movePawns(Case* c)
 
         if(trouve != 0)
         {
-            if(oldCase == c)
+            if(this->isWhiteToMove != this->isStackWhite(oldCase->pawnList))
             {
-                qDebug()<<"Impossible : pion deja sur la case";
+                qDebug()<<"Ce n'est pas a ton tour de jouer";
             }
             else
             {
-                if(lengthOfStack(toMove_iterator,oldCase->pawnList) > 3)
+                if(oldCase == c)
                 {
-                    qDebug()<<"Nombre de pieces maximum autorisees : 3";
+                    qDebug()<<"Impossible : pion deja sur la case";
                 }
                 else
                 {
-                    if(lengthOfMovement(oldCase,c) != lengthOfStack(toMove_iterator,oldCase->pawnList))
+                    if(lengthOfStack(toMove_iterator,oldCase->pawnList) > 3)
                     {
-                        qDebug()<<"Mouvement impossible (mouvement different du nombre de pieces prises)";
+                        qDebug()<<"Nombre de pieces maximum autorisees : 3";
                     }
                     else
                     {
-                        qDebug()<<"Taille de la pile : " << std::distance(toMove_iterator,oldCase->pawnList.end());
-                        qDebug()<<"Taille de la pile : " << lengthOfStack(toMove_iterator,oldCase->pawnList);
-                        qDebug()<<"Distance : " << lengthOfMovement(oldCase,c);
-
-                        while(toMove_iterator != oldCase->pawnList.end())
+                        if(lengthOfMovement(oldCase,c) != lengthOfStack(toMove_iterator,oldCase->pawnList))
                         {
-                            toMove = *toMove_iterator;
-                            insertPawn(c,toMove);
-                            toMove_iterator = oldCase->pawnList.erase(toMove_iterator);
-                            toMove->setSelected(0);
+                            qDebug()<<"Mouvement impossible (mouvement different du nombre de pieces prises)";
+                        }
+                        else
+                        {
+                            qDebug()<<"Taille de la pile : " << std::distance(toMove_iterator,oldCase->pawnList.end());
+                            qDebug()<<"Taille de la pile : " << lengthOfStack(toMove_iterator,oldCase->pawnList);
+                            qDebug()<<"Distance : " << lengthOfMovement(oldCase,c);
+
+                            while(toMove_iterator != oldCase->pawnList.end())
+                            {
+                                toMove = *toMove_iterator;
+                                insertPawn(c,toMove);
+                                toMove_iterator = oldCase->pawnList.erase(toMove_iterator);
+                                toMove->setSelected(0);
+                            }
+                            emit moveFinished();
                         }
                     }
                 }
@@ -241,4 +252,24 @@ int Board::lengthOfMovement(Case* departure,Case* arrival)
     else dist_j = (ja - jd);
 
     return dist_i + dist_j;
+}
+
+void Board::setToMove(bool b)
+{
+    this->isWhiteToMove = b;
+}
+
+// Cette fonction détermine si le dernier de la pile est blanc. Si il n'est pas blanc alors il est
+// noir
+
+bool Board::isStackWhite(list<PawnLabel*> &l)
+{
+    list<PawnLabel*>::iterator it;
+
+    it = l.end();
+    it--;
+    PawnLabel *lastPawn = *it;
+
+    return lastPawn->getIsWhite();
+
 }

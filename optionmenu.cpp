@@ -65,18 +65,19 @@ OptionMenu::OptionMenu(QWidget *parent) : QWidget(parent)
 
  void OptionMenu::handleButton()
  {
-     //TODO : Gérer les infos des boutons, injecter ça dans PoGo, et démarrer le jeu !!
-     qDebug()<<"Bouton presse. Prise en compte des options...";
-     this->WhiteIALevel = this->liste1->currentIndex() + 1;
-     this->BlackIALevel = this->liste2->currentIndex() + 1;
+    //TODO : Gérer les infos des boutons, injecter ça dans PoGo, et démarrer le jeu !!
+    qDebug()<<"Bouton presse. Prise en compte des options...";
+    this->WhiteIALevel = this->liste1->currentIndex() + 1;
+    this->BlackIALevel = this->liste2->currentIndex() + 1;
 
-     this->WhiteIA = whiteChoiceIa->isChecked();
-     this->BlackIA = blackChoiceIa->isChecked();
+    this->WhiteIA = whiteChoiceIa->isChecked();
+    this->BlackIA = blackChoiceIa->isChecked();
 
-     qDebug()<<"Options du jeu : Blancs IA ? " << WhiteIA << " Noirs IA ? " << BlackIA << "Niveaux respectifs (si IA) : " << WhiteIALevel << " " << BlackIALevel;
-     qDebug()<<"Demarrage du jeu.";
+    qDebug()<<"Options du jeu : Blancs IA ? " << WhiteIA << " Noirs IA ? " << BlackIA << "Niveaux respectifs (si IA) : " << WhiteIALevel << " " << BlackIALevel;
+    qDebug()<<"Demarrage du jeu !!!";
 
-     PoGo *pg = new PoGo(NULL,WhiteIA,BlackIA,WhiteIALevel,BlackIALevel);
-
-     this->close();
+    PoGo *pg = new PoGo(NULL,WhiteIA,BlackIA,WhiteIALevel,BlackIALevel);
+    this->close();
+    pg->startGame();
+    qDebug()<<"Le jeu tourne.";
  }

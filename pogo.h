@@ -4,6 +4,7 @@
 #include <board.h>
 #include <player.h>
 #include <optionmenu.h>
+#include <QEventLoop>
 
 /* La classe PoGo est la classe maitraisse du jeu, c'est elle qui determine qui joue a quel moment, et quand le jeu se finit */
 

@@ -19,6 +19,7 @@ public:
     ~PawnLabel(){}
     int getSelected();
     void setSelected(int select);
+    bool getIsWhite();
 
 
 signals:

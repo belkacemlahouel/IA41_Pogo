@@ -63,3 +63,8 @@ void PawnLabel::setSelected(int select)
 {
     this->selected = select;
 }
+
+bool PawnLabel::getIsWhite()
+{
+    return this->isWhite;
+}

@@ -8,7 +8,7 @@ class Board : public QWidget
 Q_OBJECT
 private:
     Case **board;
-
+    bool isWhiteToMove;
 
 public:
     Board(QWidget* parent);
@@ -20,6 +20,11 @@ public:
     void printBoard();
     int lengthOfMovement(Case *departure, Case *arrival);
     int lengthOfStack(list<PawnLabel*>::iterator it, list<PawnLabel *> &list);
+    void setToMove(bool b);
+    bool isStackWhite(list<PawnLabel*> &l);
+
+signals:
+    void moveFinished();
 
 public slots:
     void movePawns(Case *c);
