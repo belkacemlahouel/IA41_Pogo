@@ -21,8 +21,9 @@ PoGo::PoGo(QWidget *parent) : QWidget(parent)
 PoGo::PoGo(QWidget *parent,bool WhiteIsIa, bool BlackIsIa, int WhiteIaLevel, int BlackIaLevel) : QWidget(parent)
 {
     this->b = new Board(this);
-
     QPalette p;
+    this->turnLabel = new QLabel("XXXXXXXXXXXXXXXXX",this);
+    this->turnLabel->move(200,500);
 
     this->setFixedSize(490, 540);
 
@@ -49,13 +50,14 @@ void PoGo::startGame()
     bool winner = 0;
     QEventLoop pause;
     connect(b, SIGNAL(moveFinished()), &pause, SLOT(quit()));
+    QFont f( "Arial", 16, QFont::Bold);
+    turnLabel->setFont(f);
 
     while(!winner)
     {
         qDebug()<< "Tour des blancs";
-
-        // Pour faire en sorte que ce soit que les noirs ou que les blancs qui jouent, mettre une
-        // caractéristique
+        turnLabel->setText("BLANCS");
+        turnLabel->setStyleSheet("QLabel { color: white }");
         b->setToMove(true);
         pause.exec();
 
@@ -64,6 +66,8 @@ void PoGo::startGame()
         // vérification si quelqu'un a gagné
 
         qDebug()<< "Tour des noirs";
+        turnLabel->setText("NOIRS");
+        turnLabel->setStyleSheet("QLabel { color: black }");
         b->setToMove(false);
         pause.exec();
 

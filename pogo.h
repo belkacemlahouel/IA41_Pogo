@@ -17,6 +17,7 @@ private:
     Player blackPlayer;
     int whiteIAPower; // 1 = nul, 2 = bon, 3 = très bon
     int blackIAPower;
+    QLabel* turnLabel;
 
 public:
     PoGo(QWidget *parent=0);

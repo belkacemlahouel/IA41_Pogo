@@ -47,8 +47,6 @@ Board::Board(QWidget* parent):QWidget(parent)
 
     /* Création de tous les pions, et positionnement */
 
-
-
     /*PawnLabel* black_label =new PawnLabel(parent,false);
     PawnLabel* white_label =new PawnLabel(parent,true);*/
 
