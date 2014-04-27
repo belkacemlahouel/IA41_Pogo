@@ -61,6 +61,8 @@ void PoGo::startGame()
 
         qDebug()<< "Les blancs ont joue";
 
+        // vérification si quelqu'un a gagné
+
         qDebug()<< "Tour des noirs";
         b->setToMove(false);
         pause.exec();
@@ -69,9 +71,6 @@ void PoGo::startGame()
 
         // vérification si quelqu'un a gagné
 
-        // tour des noirs
-
-        // vérification si quelqu'un a gagné
     }
 }
 

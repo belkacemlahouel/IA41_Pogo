@@ -1,5 +1,7 @@
 #include "optionmenu.h"
 
+/* La fenêtre d'option est codée et designée en dur, c'est pourquoi le code est long */
+
 OptionMenu::OptionMenu(QWidget *parent) : QWidget(parent)
 {    
     this->setFixedSize(490, 250);
@@ -62,6 +64,12 @@ OptionMenu::OptionMenu(QWidget *parent) : QWidget(parent)
 
     this->show();
 }
+
+/* Déclenchée lorsque les options sont validées, cette fonction :
+ * - récupère les options rentrées
+ * - ferme les options
+ * - créé le jeu "PoGo" avec les paramètres correspondant
+ * - lance le jeu avec PoGo::startGame() */
 
  void OptionMenu::handleButton()
  {
