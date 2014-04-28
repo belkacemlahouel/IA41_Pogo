@@ -45,8 +45,9 @@ PoGo::PoGo(QWidget *parent,bool WhiteIsIa, bool BlackIsIa, int WhiteIaLevel, int
 
 void PoGo::startGame()
 {
-    bool winner = 0;
+    int winner = 0;
     QEventLoop pause;
+    QMessageBox msgBox;
     connect(b, SIGNAL(moveFinished()), &pause, SLOT(quit()));
     QFont f( "Arial", 16, QFont::Bold);
     turnLabel->setFont(f);
@@ -61,7 +62,7 @@ void PoGo::startGame()
 
         qDebug()<< "Les blancs ont joue";
 
-        // vérification si quelqu'un a gagné
+        winner = whoWon();
 
         qDebug()<< "Tour des noirs";
         turnLabel->setText("NOIRS");
@@ -71,18 +72,53 @@ void PoGo::startGame()
 
         qDebug()<< "Les noirs ont joue";
 
-        // vérification si quelqu'un a gagné
-
+        winner = whoWon();
     }
 
     if(winner == 1)
     {
         qDebug()<<"Les blancs ont gagne !!";
+        msgBox.setText("Les blancs ont gagne !!");
     }
     else if(winner == 2)
     {
         qDebug()<<"Les noirs on gagne !!";
+        msgBox.setText("Les noirs ont gagne !!");
     }
+
+    msgBox.exec();
+}
+
+int PoGo::whoWon()
+{
+    bool allWhite = true;
+    bool allBlack = true;
+
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            if(b->board[i][j].pawnList.size() != 0 && b->isStackWhite(b->board[i][j].pawnList))
+            {
+                allBlack = false;
+            }
+            else if(b->board[i][j].pawnList.size() != 0 && !(b->isStackWhite(b->board[i][j].pawnList)))
+            {
+                allWhite = false;
+            }
+        }
+    }
+
+    if(allWhite)
+    {
+        return 1;
+    }
+    else if(allBlack)
+    {
+        return 2;
+    }
+
+    return 0;
 }
 
 /* Cette fonction set tous les paramètres du jeu. Elle sera appellee a la cloture de l'option menu */

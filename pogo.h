@@ -6,6 +6,7 @@
 #include <player.h>
 #include <optionmenu.h>
 #include <QEventLoop>
+#include <QMessageBox>
 
 /* La classe PoGo est la classe maitraisse du jeu, c'est elle qui determine qui joue a quel moment, et quand le jeu se finit */
 
@@ -19,6 +20,7 @@ private:
     Player blackPlayer;
     int whiteIAPower; // 1 = nul, 2 = bon, 3 = très bon
     int blackIAPower;
+    int whoWon();
     QLabel* turnLabel;
     void makeConnections();
 
