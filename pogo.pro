@@ -9,7 +9,8 @@ SOURCES += \
     player.cpp \
     optionmenu.cpp \
     pawn.cpp \
-    casegui.cpp
+    casegui.cpp \
+    boardgui.cpp
 
 OTHER_FILES +=
 
@@ -24,4 +25,5 @@ HEADERS += \
     player.h \
     optionmenu.h \
     pawn.h \
-    casegui.h
+    casegui.h \
+    boardgui.h

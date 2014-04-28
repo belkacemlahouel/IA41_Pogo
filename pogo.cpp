@@ -2,8 +2,6 @@
 
 PoGo::PoGo(QWidget *parent) : QWidget(parent)
 {
-    this->b = new Board(this);
-
     QPalette p;
 
     this->setFixedSize(490, 490);
@@ -20,8 +18,11 @@ PoGo::PoGo(QWidget *parent) : QWidget(parent)
 
 PoGo::PoGo(QWidget *parent,bool WhiteIsIa, bool BlackIsIa, int WhiteIaLevel, int BlackIaLevel) : QWidget(parent)
 {
-    this->b = new Board(this);
-    QPalette p;
+    this->b = new Board();
+    this->bGUI = new BoardGUI(this);
+
+    makeConnections();
+
     this->turnLabel = new QLabel("XXXXXXXXXXXXXXX",this);
     this->turnLabel->move(200,500);
 
@@ -32,13 +33,13 @@ PoGo::PoGo(QWidget *parent,bool WhiteIsIa, bool BlackIsIa, int WhiteIaLevel, int
     this->blackIAPower = BlackIaLevel;
     this->whiteIAPower = WhiteIaLevel;
 
+    QPalette p;
     p = this->palette();
     p.setColor(QPalette::Background, Qt::blue);
 
     this->setAutoFillBackground(true);
     this->setPalette(p);
 
-    // Affichage de la fenêtre
     this->show();
 }
 
@@ -73,11 +74,62 @@ void PoGo::startGame()
         // vérification si quelqu'un a gagné
 
     }
+
+    if(winner == 1)
+    {
+        qDebug()<<"Les blancs ont gagne !!";
+    }
+    else if(winner == 2)
+    {
+        qDebug()<<"Les noirs on gagne !!";
+    }
 }
 
 /* Cette fonction set tous les paramètres du jeu. Elle sera appellee a la cloture de l'option menu */
 
 void PoGo::setAllSettings()
 {
+
+}
+
+void PoGo::makeConnections()
+{
+    qDebug()<<"Etablissement des connexions necessaires...";
+
+    /* Connexion des pawnLabel à leur pawn associe */
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            list<PawnLabel*>::iterator labelIt = this->bGUI->boardGUI[i][j].pawnListGUI.begin();
+            list<Pawn*>::iterator pawnIt = this->b->board[i][j].pawnList.begin();
+
+            while(pawnIt != this->b->board[i][j].pawnList.end())
+            {
+                Pawn *temp = *pawnIt;
+                PawnLabel *tempLabel = *labelIt;
+
+                connect(tempLabel,SIGNAL(clicked()),temp,SLOT(labelClicked()));
+
+                pawnIt++;
+                labelIt++;
+            }
+        }
+    }
+
+    /* Connexion de board et boardGUI */
+
+    connect(b,SIGNAL(movePawnLabelsSignal(Case*,Case*)),bGUI,SLOT(movePawnLabels(Case*,Case*)));
+
+    /* Connexion des CaseGUI au plateau (le clic sur les cases déclence la fonction movePawns) */
+
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            CaseGUI *c = &(bGUI->boardGUI[i][j]);
+            connect(c,SIGNAL(caseClicked(CaseGUI*)),b,SLOT(movePawns(CaseGUI*)));
+        }
+    }
 
 }

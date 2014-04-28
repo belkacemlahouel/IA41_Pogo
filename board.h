@@ -4,37 +4,32 @@
 #include <case.h>
 #include <casegui.h>
 
-class Board : public QWidget
+class Board : public QObject
 {
 Q_OBJECT
 private:
-    Case **board;
-    CaseGUI **boardGUI;
-
     bool isWhiteToMove;
 
 public:
-    Board(QWidget* parent);
+    Board();
     ~Board(){}
     void insertPawn(Case* c, Pawn *p);
-    void insertPawnLabel(CaseGUI* c, PawnLabel *p);
     // this function inserts the pawn into the list of pawns on the case c(i,j)
     void insertPawn(int i, int j, Pawn* p);
-    void insertPawnLabel(int i, int j, PawnLabel *p);
-    void removePawn(CaseGUI *c, PawnLabel *p);
-    void printBoard();
     int lengthOfMovement(Case *departure, Case *arrival);
     int lengthOfStack(list<Pawn*>::iterator it, list<Pawn *> &list);
     void setToMove(bool b);
     bool isStackWhite(list<Pawn*> &l);
-    void movePawnLabels(Case *oldCase, Case *dest);
+
+    // A METTRE EN PRIVE !!
+    Case **board;
 
 signals:
     void moveFinished();
+    void movePawnLabelsSignal(Case *oldCase,Case* dest);
 
 public slots:
     void movePawns(CaseGUI *cGUI);
-    void deselectPawnsLabels(PawnLabel *p);
     void deselectPawns(Pawn *p);
 
 };

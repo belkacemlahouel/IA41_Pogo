@@ -2,6 +2,7 @@
 #define POGO_H
 
 #include <board.h>
+#include <boardgui.h>
 #include <player.h>
 #include <optionmenu.h>
 #include <QEventLoop>
@@ -13,11 +14,13 @@ class PoGo : public QWidget
     Q_OBJECT
 private:
     Board *b;
+    BoardGUI *bGUI;
     Player whitePlayer;
     Player blackPlayer;
     int whiteIAPower; // 1 = nul, 2 = bon, 3 = très bon
     int blackIAPower;
     QLabel* turnLabel;
+    void makeConnections();
 
 public:
     PoGo(QWidget *parent=0);
