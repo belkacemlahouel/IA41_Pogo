@@ -4,14 +4,28 @@
 Board::Board(QWidget* parent):QWidget(parent)
 {
     this->isWhiteToMove = true;
+
+    /* Creation des cases et de leur version graphique */
     this->board = new Case*[3];
+    this->boardGUI = new CaseGUI*[3];
+
     for (int i = 0; i < 3; ++i)
             board[i] = new Case[3];
+
+    for (int i = 0; i < 3; ++i)
+            boardGUI[i] = new CaseGUI[3];
 
     for(int i=0;i<3;i++)
     {
         for(int j=0;j<3;j++){
-            this->board[i][j] = Case(j+1 +(i*3),parent);
+            this->board[i][j] = Case(j+1 +(i*3));
+        }
+    }
+
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++){
+            this->boardGUI[i][j] = CaseGUI(j+1 +(i*3),parent);
         }
     }
 
@@ -47,15 +61,15 @@ Board::Board(QWidget* parent):QWidget(parent)
     {
         for(int j=0;j<3;j++){
 
-            int x = i*this->board[i][j].getCaseSize()+i*10+10;
-            int y = j*this->board[i][j].getCaseSize()+j*10+10;
+            int x = i*this->boardGUI[i][j].getCaseSize()+i*10+10;
+            int y = j*this->boardGUI[i][j].getCaseSize()+j*10+10;
 
-            this->board[i][j].setParent(parent);
-            this->board[i][j].setPixmap(case_pixmap);
-            this->board[i][j].move(x,y);
+            this->boardGUI[i][j].setParent(parent);
+            this->boardGUI[i][j].setPixmap(case_pixmap);
+            this->boardGUI[i][j].move(x,y);
 
             /* Connexion des cases au plateau */
-            connect(&(this->board[i][j]), SIGNAL(caseClicked(Case*) ), this, SLOT( movePawns(Case*)));
+            connect(&(this->boardGUI[i][j]), SIGNAL(caseClicked(CaseGUI*) ), this, SLOT( movePawns(CaseGUI*)));
         }
     }
 
@@ -80,7 +94,7 @@ Board::Board(QWidget* parent):QWidget(parent)
     {
         for(int j=0;j<3;j++)
         {
-            list<PawnLabel*>::iterator labelIt = this->board[i][j].pawnListGUI.begin();
+            list<PawnLabel*>::iterator labelIt = this->boardGUI[i][j].pawnListGUI.begin();
             list<Pawn*>::iterator pawnIt = this->board[i][j].pawnList.begin();
 
             while(pawnIt != this->board[i][j].pawnList.end())
@@ -103,7 +117,7 @@ Board::Board(QWidget* parent):QWidget(parent)
         for(int j=0;j<3;j++)
         {
 
-            for(it = this->board[i][j].pawnListGUI.begin();it != this->board[i][j].pawnListGUI.end() ; it++)
+            for(it = this->boardGUI[i][j].pawnListGUI.begin();it != this->boardGUI[i][j].pawnListGUI.end() ; it++)
             {
                 PawnLabel *temp = *it;
                 connect(temp,SIGNAL(deselectOthers(PawnLabel*)),this,SLOT(deselectPawnsLabels(PawnLabel*)));
@@ -142,7 +156,7 @@ void Board::insertPawn(int i, int j, Pawn *p)
 
 void Board::insertPawnLabel(int i, int j, PawnLabel *p)
 {
-    Case* c= &(this->board[i][j]);
+    CaseGUI* c= &(this->boardGUI[i][j]);
 
     int x = c->x() + c->getCaseSize()/2 - 25;
     int y = c->y() + c->getCaseSize() - 15 - c->pawnListGUI.size()*10;
@@ -157,7 +171,7 @@ void Board::insertPawn(Case* c, Pawn *p)
     c->pawnList.push_back(p);
 }
 
-void Board::insertPawnLabel(Case* c, PawnLabel *p)
+void Board::insertPawnLabel(CaseGUI* c, PawnLabel *p)
 {
     int x = c->x() + c->getCaseSize()/2 - 25;
     int y = c->y() + c->getCaseSize() - 15 - c->pawnListGUI.size()*10;
@@ -165,7 +179,7 @@ void Board::insertPawnLabel(Case* c, PawnLabel *p)
     p->move(x,y);
 }
 
-void Board::removePawn(Case* c, PawnLabel *p)
+void Board::removePawn(CaseGUI* c, PawnLabel *p)
 {
     c->pawnListGUI.remove(p);
 }
@@ -186,13 +200,27 @@ void Board::printBoard()
 /* Pour que l'IA puisse bouger un pion, il faut qu'elle setSelected du/des pions à bouger à 1, et qu'elle sélectionne sa case.
  Pour finir, on appellera movePaws, qui fera directement le lien entre la case choisie et le pion auparavent sélectionné*/
 
-void Board::movePawns(Case* c)
+void Board::movePawns(CaseGUI* cGUI)
 {
     qDebug()<<"Case clicked !";
 
     int trouve = 0;
     int i;
     int j;
+
+    Case* c;
+    /* Recherche de la case correspondant a caseGUI */
+
+    for(i=0;i<3;i++)
+    {
+        for(j=0;j<3;j++)
+        {
+            if(board[i][j].getCaseNum() == cGUI->getCaseNum())
+            {
+               c = &board[i][j];
+            }
+        }
+    }
 
     /* On cherche pour toutes les cases, la première qui contient un pion à la caractéristique "selected" à 1. Quand on le trouve, on
      * prend automatiquement tous les pions qui sont au dessus de lui dans la liste, sans se soucier de leur statut */
@@ -216,7 +244,6 @@ void Board::movePawns(Case* c)
                             oldCase = &(this->board[i][j]);
                         }
                     }
-
             }
         }
 
@@ -279,7 +306,35 @@ void Board::movePawnLabels(Case* oldCase,Case* dest)
     list<PawnLabel*>::iterator it;
     list<PawnLabel*>::iterator toMove_iterator;
 
-    for (it=oldCase->pawnListGUI.begin(); it != oldCase->pawnListGUI.end(); ++it)
+    CaseGUI* oldCaseGUI;
+    CaseGUI* destGUI;
+
+    /* On recherche les versions GUI des cases oldCase et dest */
+
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            if(boardGUI[i][j].getCaseNum() == oldCase->getCaseNum())
+            {
+               oldCaseGUI = &boardGUI[i][j];
+            }
+        }
+    }
+
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            if(boardGUI[i][j].getCaseNum() == dest->getCaseNum())
+            {
+               destGUI = &boardGUI[i][j];
+            }
+        }
+    }
+
+
+    for (it=oldCaseGUI->pawnListGUI.begin(); it != oldCaseGUI->pawnListGUI.end(); ++it)
     {
         if((*it)->getSelected() == 1)
         {
@@ -287,11 +342,11 @@ void Board::movePawnLabels(Case* oldCase,Case* dest)
         }
     }
 
-    while(toMove_iterator != oldCase->pawnListGUI.end())
+    while(toMove_iterator != oldCaseGUI->pawnListGUI.end())
     {
         toMove = *toMove_iterator;
-        insertPawnLabel(dest,toMove);
-        toMove_iterator = oldCase->pawnListGUI.erase(toMove_iterator);
+        insertPawnLabel(destGUI,toMove);
+        toMove_iterator = oldCaseGUI->pawnListGUI.erase(toMove_iterator);
         toMove->setSelected(0);
     }
 }
@@ -373,7 +428,7 @@ void Board::deselectPawnsLabels(PawnLabel *p)
     {
         for(int j=0;j<3;j++)
         {
-            for(it = this->board[i][j].pawnListGUI.begin();it != this->board[i][j].pawnListGUI.end() ; it++)
+            for(it = this->boardGUI[i][j].pawnListGUI.begin();it != this->boardGUI[i][j].pawnListGUI.end() ; it++)
             {
                 PawnLabel *temp = *it;
                 if(temp != p)

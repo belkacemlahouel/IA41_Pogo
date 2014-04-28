@@ -1,20 +1,12 @@
 #include "case.h"
-#define CASE_SIZE 150
 
-Case::Case() : QLabel()
+Case::Case()
 {
-    this->caseSize = CASE_SIZE;
 }
 
-Case::Case(QWidget * parent) : QLabel(parent)
-{
-    this->caseSize = CASE_SIZE;
-}
-
-Case::Case(int num,QWidget * parent) : QLabel(parent)
+Case::Case(int num)
 {
     this->caseNum = num;
-    this->caseSize = CASE_SIZE;
 }
 
 Case& Case::operator =(const Case& c)
@@ -30,12 +22,7 @@ void Case::printContent()
     cout << " " << this->pawnList.size() << endl;
 }
 
-int Case::getCaseSize()
+int Case::getCaseNum()
 {
-    return this->caseSize;
-}
-
-void Case::mousePressEvent ( QMouseEvent * event )
-{
-    emit caseClicked(this);
+    return this->caseNum;
 }

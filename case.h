@@ -12,33 +12,23 @@
 
 using namespace std;
 
-class Case : public QLabel
+class Case : public QObject
 {
 Q_OBJECT
 private:
-
     int caseNum;
-    int caseSize;
 
 public:
-    Case();
-    Case(QWidget * parent);
-    Case(int num, QWidget *parent);
+    Case ();
+    Case(int num);
     ~Case(){}
     Case& operator =(const Case& c);
-
-    // TODO : CHANGE TO PRIVATE
-    std::list<Pawn*> pawnList;
-    std::list<PawnLabel*> pawnListGUI;
-
+    int getCaseNum();
     void printContent();
     int getCaseSize();
 
-signals:
-    void caseClicked(Case*);
-
-public slots:
-    void mousePressEvent ( QMouseEvent * event ) ;
+    // TODO : CHANGE TO PRIVATE
+    std::list<Pawn*> pawnList;
 
 };
 
