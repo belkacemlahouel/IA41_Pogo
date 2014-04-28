@@ -10,14 +10,12 @@ class PawnLabel : public QLabel
 {
 Q_OBJECT
 private:
-    int selected;
-    bool isWhite; // S'il n'est pas blanc, il est noir.
+    int selected = 0;
     QPixmap pic;
     QPixmap selectpic;
 
 public:
-    PawnLabel(QWidget * parent = 0 );
-    PawnLabel(QWidget * parent, bool _isWhite);
+    PawnLabel(QWidget * parent = 0 , bool isWhite = false);
     ~PawnLabel(){}
     int getSelected();
     void setSelected(int select);

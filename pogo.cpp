@@ -22,7 +22,7 @@ PoGo::PoGo(QWidget *parent,bool WhiteIsIa, bool BlackIsIa, int WhiteIaLevel, int
 {
     this->b = new Board(this);
     QPalette p;
-    this->turnLabel = new QLabel("XXXXXXXXXXXXXXXXX",this);
+    this->turnLabel = new QLabel("XXXXXXXXXXXXXXX",this);
     this->turnLabel->move(200,500);
 
     this->setFixedSize(490, 540);
@@ -41,9 +41,6 @@ PoGo::PoGo(QWidget *parent,bool WhiteIsIa, bool BlackIsIa, int WhiteIaLevel, int
     // Affichage de la fenêtre
     this->show();
 }
-
-/* FAIRE EN SORTE DE DEMARER CETTE FONCTION SEULEMENT UNE FOIS L'OPTION MENU FERME
- * c'est dans cette méthode que l'IA et le joueur joueront, jusqu'à la fin du jeu */
 
 void PoGo::startGame()
 {

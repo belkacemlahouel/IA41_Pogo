@@ -23,6 +23,24 @@ Board::Board(QWidget* parent):QWidget(parent)
         qWarning("Failed to load case.png");
     }
 
+    /* Création de tous les pions, et ajout au plateau */
+
+    qDebug()<<"Insertion des pions";
+
+    this->insertPawn(0,0,new Pawn(true));
+    this->insertPawn(0,0,new Pawn(true));
+    this->insertPawn(1,0,new Pawn(true));
+    this->insertPawn(1,0,new Pawn(true));
+    this->insertPawn(2,0,new Pawn(true));
+    this->insertPawn(2,0,new Pawn(true));
+
+    this->insertPawn(0,2,new Pawn(false));
+    this->insertPawn(0,2,new Pawn(false));
+    this->insertPawn(1,2,new Pawn(false));
+    this->insertPawn(1,2,new Pawn(false));
+    this->insertPawn(2,2,new Pawn(false));
+    this->insertPawn(2,2,new Pawn(false));
+
     list<PawnLabel*>::iterator it;
 
     for(int i=0;i<3;i++)
@@ -35,76 +53,121 @@ Board::Board(QWidget* parent):QWidget(parent)
             this->board[i][j].setParent(parent);
             this->board[i][j].setPixmap(case_pixmap);
             this->board[i][j].move(x,y);
-            connect(&(this->board[i][j]), SIGNAL(caseClicked(Case*) ), this, SLOT( movePawns(Case*)));
 
-            for(it = this->board[i][j].pawnList.begin();it != this->board[i][j].pawnList.end() ; it++)
-            {
-                PawnLabel *temp = *it;
-                connect(temp,SIGNAL(deselectOthers(PawnLabel*)),this,SLOT(deselectPawns(PawnLabel*)));
-            }// connexion de toutes les cases au plateau.
+            /* Connexion des cases au plateau */
+            connect(&(this->board[i][j]), SIGNAL(caseClicked(Case*) ), this, SLOT( movePawns(Case*)));
         }
     }
 
-    /* Création de tous les pions, et positionnement */
+    /* Création de tous les pions version GUI, et ajout au plateau */
 
-    /*PawnLabel* black_label =new PawnLabel(parent,false);
-    PawnLabel* white_label =new PawnLabel(parent,true);*/
+    this->insertPawnLabel(0,0,new PawnLabel(parent,true));
+    this->insertPawnLabel(0,0,new PawnLabel(parent,true));
+    this->insertPawnLabel(1,0,new PawnLabel(parent,true));
+    this->insertPawnLabel(1,0,new PawnLabel(parent,true));
+    this->insertPawnLabel(2,0,new PawnLabel(parent,true));
+    this->insertPawnLabel(2,0,new PawnLabel(parent,true));
 
-    qDebug()<<"Insertion des pions";
+    this->insertPawnLabel(0,2,new PawnLabel(parent,false));
+    this->insertPawnLabel(0,2,new PawnLabel(parent,false));
+    this->insertPawnLabel(1,2,new PawnLabel(parent,false));
+    this->insertPawnLabel(1,2,new PawnLabel(parent,false));
+    this->insertPawnLabel(2,2,new PawnLabel(parent,false));
+    this->insertPawnLabel(2,2,new PawnLabel(parent,false));
 
-    this->insertPawn(0,0,new PawnLabel(parent,true));
-    this->insertPawn(0,0,new PawnLabel(parent,true));
-    this->insertPawn(1,0,new PawnLabel(parent,true));
-    this->insertPawn(1,0,new PawnLabel(parent,true));
-    this->insertPawn(2,0,new PawnLabel(parent,true));
-    this->insertPawn(2,0,new PawnLabel(parent,true));
+    /* Connexion des pawnLabel à leur pawn associe */
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            list<PawnLabel*>::iterator labelIt = this->board[i][j].pawnListGUI.begin();
+            list<Pawn*>::iterator pawnIt = this->board[i][j].pawnList.begin();
 
-    this->insertPawn(0,2,new PawnLabel(parent,false));
-    this->insertPawn(0,2,new PawnLabel(parent,false));
-    this->insertPawn(1,2,new PawnLabel(parent,false));
-    this->insertPawn(1,2,new PawnLabel(parent,false));
-    this->insertPawn(2,2,new PawnLabel(parent,false));
-    this->insertPawn(2,2,new PawnLabel(parent,false));
+            while(pawnIt != this->board[i][j].pawnList.end())
+            {
+                Pawn *temp = *pawnIt;
+                PawnLabel *tempLabel = *labelIt;
+
+                connect(tempLabel,SIGNAL(clicked()),temp,SLOT(labelClicked()));
+
+                pawnIt++;
+                labelIt++;
+            }
+        }
+    }
+
+    /* Connexion des pawnsLabels au plateau */
 
     for(int i=0;i<3;i++)
     {
         for(int j=0;j<3;j++)
         {
-            for(it = this->board[i][j].pawnList.begin();it != this->board[i][j].pawnList.end() ; it++)
+
+            for(it = this->board[i][j].pawnListGUI.begin();it != this->board[i][j].pawnListGUI.end() ; it++)
             {
                 PawnLabel *temp = *it;
-                connect(temp,SIGNAL(deselectOthers(PawnLabel*)),this,SLOT(deselectPawns(PawnLabel*)));
-            }// connexion de toutes les cases au plateau.
+                connect(temp,SIGNAL(deselectOthers(PawnLabel*)),this,SLOT(deselectPawnsLabels(PawnLabel*)));
+            }
+        }
+    }
+
+    /* Connexion des pawns au plateau */
+
+    list<Pawn*>::iterator it2;
+
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            for(it2 = this->board[i][j].pawnList.begin();it2 != this->board[i][j].pawnList.end() ; it2++)
+            {
+                Pawn *temp = *it2;
+                connect(temp,SIGNAL(deselectOthers(Pawn*)),this,SLOT(deselectPawns(Pawn*)));
+            }
         }
     }
 
 }
 
-/* Insère un pion dans board[i][j].pawnList, ainsi que graphiquement */
+/* Insère un pion dans board[i][j].pawnList */
 
-void Board::insertPawn(int i, int j, PawnLabel *p)
+void Board::insertPawn(int i, int j, Pawn *p)
+{
+    Case* c= &(this->board[i][j]);
+
+    c->pawnList.push_back(p);
+}
+
+/* Idem que insertPawn, mais GRAPHIQUEMENT */
+
+void Board::insertPawnLabel(int i, int j, PawnLabel *p)
 {
     Case* c= &(this->board[i][j]);
 
     int x = c->x() + c->getCaseSize()/2 - 25;
-    int y = c->y() + c->getCaseSize() - 15 - c->pawnList.size()*10;
-    c->pawnList.push_back(p);
+    int y = c->y() + c->getCaseSize() - 15 - c->pawnListGUI.size()*10;
+    c->pawnListGUI.push_back(p);
     p->move(x,y);
 }
 
-/* Insère un pion dans c.pawnList, ainsi que graphiquement */
+/* Insère un pion dans c.pawnList */
 
-void Board::insertPawn(Case* c, PawnLabel *p)
+void Board::insertPawn(Case* c, Pawn *p)
+{
+    c->pawnList.push_back(p);
+}
+
+void Board::insertPawnLabel(Case* c, PawnLabel *p)
 {
     int x = c->x() + c->getCaseSize()/2 - 25;
-    int y = c->y() + c->getCaseSize() - 15 - c->pawnList.size()*10;
-    c->pawnList.push_back(p);
+    int y = c->y() + c->getCaseSize() - 15 - c->pawnListGUI.size()*10;
+    c->pawnListGUI.push_back(p);
     p->move(x,y);
 }
 
 void Board::removePawn(Case* c, PawnLabel *p)
 {
-    c->pawnList.remove(p);
+    c->pawnListGUI.remove(p);
 }
 
 void Board::printBoard()
@@ -131,26 +194,13 @@ void Board::movePawns(Case* c)
     int i;
     int j;
 
-    for(i=0;i<3;i++)
-    {
-        for(j=0;j<3;j++){
-
-            if(&(this->board[i][j]) == c)
-               break;
-        }
-        if(&(this->board[i][j]) == c)
-           break;
-    }
-
-    qDebug()<<"Case clicked ! Position : " << i << " " << j;
-
     /* On cherche pour toutes les cases, la première qui contient un pion à la caractéristique "selected" à 1. Quand on le trouve, on
      * prend automatiquement tous les pions qui sont au dessus de lui dans la liste, sans se soucier de leur statut */
 
-    PawnLabel* toMove;
+    Pawn* toMove;
 
-    list<PawnLabel*>::iterator it;
-    list<PawnLabel*>::iterator toMove_iterator;
+    list<Pawn*>::iterator it;
+    list<Pawn*>::iterator toMove_iterator;
     Case* oldCase;
 
         for(i=0;i<3;i++)
@@ -187,20 +237,19 @@ void Board::movePawns(Case* c)
                 }
                 else
                 {
-                    if(lengthOfStack(toMove_iterator,oldCase->pawnList) > 3)
+                    if(std::distance(toMove_iterator,oldCase->pawnList.end()) > 3)
                     {
                         qDebug()<<"Nombre de pieces maximum autorisees : 3";
                     }
                     else
                     {
-                        if(lengthOfMovement(oldCase,c) != lengthOfStack(toMove_iterator,oldCase->pawnList))
+                        if(lengthOfMovement(oldCase,c) != std::distance(toMove_iterator,oldCase->pawnList.end()))
                         {
                             qDebug()<<"Mouvement impossible (mouvement different du nombre de pieces prises)";
                         }
                         else
                         {
                             qDebug()<<"Taille de la pile : " << std::distance(toMove_iterator,oldCase->pawnList.end());
-                            qDebug()<<"Taille de la pile : " << lengthOfStack(toMove_iterator,oldCase->pawnList);
                             qDebug()<<"Distance : " << lengthOfMovement(oldCase,c);
 
                             while(toMove_iterator != oldCase->pawnList.end())
@@ -210,6 +259,10 @@ void Board::movePawns(Case* c)
                                 toMove_iterator = oldCase->pawnList.erase(toMove_iterator);
                                 toMove->setSelected(0);
                             }
+
+                            /* Une fois le déplacement du modèle fini, on déplace la version graphique */
+                            movePawnLabels(oldCase,c);
+
                             emit moveFinished();
                         }
                     }
@@ -218,19 +271,31 @@ void Board::movePawns(Case* c)
         }
 }
 
-/* Cette fonction regarde la taille de la pile. Elle sera utilisée pour déterminer la validité du
- * mouvement */
 
-int Board::lengthOfStack(list<PawnLabel*>::iterator it,list<PawnLabel*>& list)
+
+void Board::movePawnLabels(Case* oldCase,Case* dest)
 {
-    int i=0;
-    while(it != list.end() )
+    PawnLabel* toMove;
+    list<PawnLabel*>::iterator it;
+    list<PawnLabel*>::iterator toMove_iterator;
+
+    for (it=oldCase->pawnListGUI.begin(); it != oldCase->pawnListGUI.end(); ++it)
     {
-        i++;
-        it++;
+        if((*it)->getSelected() == 1)
+        {
+            toMove_iterator = it;
+        }
     }
-    return i;
+
+    while(toMove_iterator != oldCase->pawnListGUI.end())
+    {
+        toMove = *toMove_iterator;
+        insertPawnLabel(dest,toMove);
+        toMove_iterator = oldCase->pawnListGUI.erase(toMove_iterator);
+        toMove->setSelected(0);
+    }
 }
+
 
 /* Cette fonction regarde la taille du mouvement entre deux cases. Elle sera utilisée pour déterminer la validité de
  * ce dernier */
@@ -286,13 +351,13 @@ void Board::setToMove(bool b)
 
 /* Cette fonction détermine si la pile appartient au joueur noir ou au blanc */
 
-bool Board::isStackWhite(list<PawnLabel*> &l)
+bool Board::isStackWhite(list<Pawn*> &l)
 {
-    list<PawnLabel*>::iterator it;
+    list<Pawn*>::iterator it;
 
     it = l.end();
     it--;
-    PawnLabel *lastPawn = *it;
+    Pawn *lastPawn = *it;
 
     return lastPawn->getIsWhite();
 
@@ -300,7 +365,7 @@ bool Board::isStackWhite(list<PawnLabel*> &l)
 
 /* Lorsqu'un pion est cliqué, cette fonction désélectionne tous les autres */
 
-void Board::deselectPawns(PawnLabel *p)
+void Board::deselectPawnsLabels(PawnLabel *p)
 {
     list<PawnLabel*>::iterator it;
 
@@ -308,9 +373,31 @@ void Board::deselectPawns(PawnLabel *p)
     {
         for(int j=0;j<3;j++)
         {
-            for(it = this->board[i][j].pawnList.begin();it != this->board[i][j].pawnList.end() ; it++)
+            for(it = this->board[i][j].pawnListGUI.begin();it != this->board[i][j].pawnListGUI.end() ; it++)
             {
                 PawnLabel *temp = *it;
+                if(temp != p)
+                {
+                    temp->setSelected(false);
+                }
+            }
+        }
+    }
+}
+
+/* Idem que deselectPawnsLabels, mais pour la version "modèle" de ces pions */
+
+void Board::deselectPawns(Pawn *p)
+{
+    list<Pawn*>::iterator it;
+
+    for(int i=0;i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            for(it = this->board[i][j].pawnList.begin();it != this->board[i][j].pawnList.end() ; it++)
+            {
+                Pawn *temp = *it;
                 if(temp != p)
                 {
                     temp->setSelected(false);

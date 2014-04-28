@@ -13,22 +13,26 @@ private:
 public:
     Board(QWidget* parent);
     ~Board(){}
-    void insertPawn(Case* c, PawnLabel *p);
+    void insertPawn(Case* c, Pawn *p);
+    void insertPawnLabel(Case* c, PawnLabel *p);
     // this function inserts the pawn into the list of pawns on the case c(i,j)
-    void insertPawn(int i, int j, PawnLabel* p);
+    void insertPawn(int i, int j, Pawn* p);
+    void insertPawnLabel(int i, int j, PawnLabel *p);
     void removePawn(Case* c, PawnLabel *p);
     void printBoard();
     int lengthOfMovement(Case *departure, Case *arrival);
-    int lengthOfStack(list<PawnLabel*>::iterator it, list<PawnLabel *> &list);
+    int lengthOfStack(list<Pawn*>::iterator it, list<Pawn *> &list);
     void setToMove(bool b);
-    bool isStackWhite(list<PawnLabel*> &l);
+    bool isStackWhite(list<Pawn*> &l);
+    void movePawnLabels(Case* oldCase, Case* dest);
 
 signals:
     void moveFinished();
 
 public slots:
     void movePawns(Case *c);
-    void deselectPawns(PawnLabel *p);
+    void deselectPawnsLabels(PawnLabel *p);
+    void deselectPawns(Pawn *p);
 
 };
 

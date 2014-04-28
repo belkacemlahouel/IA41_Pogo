@@ -1,12 +1,6 @@
 #include "pawnlabel.h"
 
-PawnLabel::PawnLabel(QWidget * parent ) : QLabel(parent)
-{
-    selected = 0;
-    connect( this, SIGNAL( clicked() ), this, SLOT( pawnClicked() ) );
-}
-
-PawnLabel::PawnLabel(QWidget * parent, bool _isWhite ) : QLabel(parent)
+PawnLabel::PawnLabel(QWidget * parent,bool isWhite) : QLabel(parent)
 {
     QPixmap pn;
     QPixmap pb;
@@ -25,9 +19,6 @@ PawnLabel::PawnLabel(QWidget * parent, bool _isWhite ) : QLabel(parent)
     if(!pbSelect.load(":/new/images/pion_blanc_select.png")){
         qWarning("Failed to load pion_blanc_select.png");
     }
-
-    isWhite = _isWhite;
-    selected = 0;
 
     if(isWhite){
         this->setPixmap(pb);
@@ -68,7 +59,7 @@ void PawnLabel::mousePressEvent ( QMouseEvent * event )
 
 int PawnLabel::getSelected()
 {
-    return this->selected;
+    return selected;
 }
 
 void PawnLabel::setSelected(int select)
@@ -80,9 +71,4 @@ void PawnLabel::setSelected(int select)
     }else{
         this->setPixmap(this->pic);
     }
-}
-
-bool PawnLabel::getIsWhite()
-{
-    return this->isWhite;
 }

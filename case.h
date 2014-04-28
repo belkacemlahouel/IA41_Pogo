@@ -2,6 +2,7 @@
 #define CASE_H
 
 #include <pawnlabel.h>
+#include <pawn.h>
 #include <iostream>
 #include <QLabel>
 #include <QWidget>
@@ -25,9 +26,14 @@ public:
     Case(int num, QWidget *parent);
     ~Case(){}
     Case& operator =(const Case& c);
-    std::list<PawnLabel*> pawnList;
+
+    // TODO : CHANGE TO PRIVATE
+    std::list<Pawn*> pawnList;
+    std::list<PawnLabel*> pawnListGUI;
+
     void printContent();
     int getCaseSize();
+
 signals:
     void caseClicked(Case*);
 

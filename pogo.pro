@@ -7,7 +7,8 @@ SOURCES += \
     board.cpp \
     pogo.cpp \
     player.cpp \
-    optionmenu.cpp
+    optionmenu.cpp \
+    pawn.cpp
 
 OTHER_FILES +=
 
@@ -20,4 +21,5 @@ HEADERS += \
     board.h \
     pogo.h \
     player.h \
-    optionmenu.h
+    optionmenu.h \
+    pawn.h
