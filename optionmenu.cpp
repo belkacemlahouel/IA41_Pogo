@@ -87,5 +87,5 @@ OptionMenu::OptionMenu(QWidget *parent) : QWidget(parent)
     PoGo *pg = new PoGo(NULL,WhiteIA,BlackIA,WhiteIALevel,BlackIALevel);
     this->close();
     pg->startGame();
-    qDebug()<<"Le jeu tourne.";
+    qDebug()<<"Le jeu tourne."; // Est-ce que ça veut dire que le jeu est FINI ? Le msg n'est affiché que dans ce cas
  }

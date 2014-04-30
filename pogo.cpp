@@ -98,14 +98,22 @@ int PoGo::whoWon()
     {
         for(int j=0;j<3;j++)
         {
-            if(b->board[i][j].pawnList.size() != 0 && b->isStackWhite(b->board[i][j].pawnList))
-            {
-                allBlack = false;
+            if (b->board[i][j].pawnList.size() > 0) {
+                if (b->isStackWhite(b->board[i][j].pawnList)) {
+                    allBlack = false;
+                } else {
+                    allWhite = false;
+                }
             }
-            else if(b->board[i][j].pawnList.size() != 0 && !(b->isStackWhite(b->board[i][j].pawnList)))
-            {
-                allWhite = false;
-            }
+
+//            if(b->board[i][j].pawnList.size() != 0 && b->isStackWhite(b->board[i][j].pawnList))
+//            {
+//                allBlack = false;
+//            }
+//            else if(b->board[i][j].pawnList.size() != 0 && !(b->isStackWhite(b->board[i][j].pawnList)))
+//            {
+//                allWhite = false;
+//            }
         }
     }
 
