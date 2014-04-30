@@ -82,7 +82,7 @@ void PoGo::startGame()
     }
     else if(winner == 2)
     {
-        qDebug()<<"Les noirs on gagne !!";
+        qDebug()<<"Les noirs ont gagne !!";
         msgBox.setText("Les noirs ont gagne !!");
     }
 
