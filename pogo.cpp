@@ -75,16 +75,18 @@ void PoGo::startGame()
         winner = whoWon();
     }
 
-    if(winner == 1)
+    if(winner == 2)
     {
-        qDebug()<<"Les blancs ont gagne !!";
-        msgBox.setText("Les blancs ont gagne !!");
-    }
-    else if(winner == 2)
-    {
-        qDebug()<<"Les noirs ont gagne !!";
+        qDebug()<<"\tLes noirs ont gagne !!";
         msgBox.setText("Les noirs ont gagne !!");
     }
+    else if(winner == 1)
+    {
+        qDebug()<<"\tLes blancs ont gagne !!";
+        msgBox.setText("Les blancs ont gagne !!");
+    }
+
+    wait();
 
     msgBox.exec();
 }
