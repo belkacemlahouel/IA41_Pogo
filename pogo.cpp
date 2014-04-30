@@ -52,7 +52,7 @@ void PoGo::startGame()
     QFont f( "Arial", 16, QFont::Bold);
     turnLabel->setFont(f);
 
-    while(!winner)
+    while (winner == 0) // while(!winner)
     {
         qDebug()<< "Tour des blancs";
         turnLabel->setText("BLANCS");
@@ -64,15 +64,19 @@ void PoGo::startGame()
 
         winner = whoWon();
 
-        qDebug()<< "Tour des noirs";
-        turnLabel->setText("NOIRS");
-        turnLabel->setStyleSheet("QLabel { color: black }");
-        b->setToMove(false);
-        pause.exec();
+        if (winner == 0) { // Arrêt dès que besoin
+            qDebug()<< "Tour des noirs";
+            turnLabel->setText("NOIRS");
+            turnLabel->setStyleSheet("QLabel { color: black }");
+            b->setToMove(false);
+            pause.exec();
 
-        qDebug()<< "Les noirs ont joue";
+            qDebug()<< "Les noirs ont joue";
 
-        winner = whoWon();
+            winner = whoWon();
+        }
+
+        qDebug() << "\t\t\t\tLE GAGNANT EST " << winner;
     }
 
     if(winner == 2)
@@ -85,8 +89,6 @@ void PoGo::startGame()
         qDebug()<<"\tLes blancs ont gagne !!";
         msgBox.setText("Les blancs ont gagne !!");
     }
-
-    wait();
 
     msgBox.exec();
 }
