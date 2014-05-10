@@ -20,6 +20,7 @@ public:
     int lengthOfStack(list<Pawn*>::iterator it, list<Pawn *> &list);
     void setToMove(bool b);
     bool isStackWhite(list<Pawn*> &l);
+    void movePawns(Case *c);
 
     // A METTRE EN PRIVE !!
     Case **board;
@@ -29,7 +30,7 @@ signals:
     void movePawnLabelsSignal(Case *oldCase,Case* dest);
 
 public slots:
-    void movePawns(CaseGUI *cGUI);
+    void caseGUIClicked(CaseGUI* cGUI);
     void deselectPawns(Pawn *p);
 
 };

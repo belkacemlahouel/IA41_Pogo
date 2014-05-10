@@ -70,23 +70,16 @@ void Board::insertPawn(Case* c, Pawn *p)
     c->pawnList.push_back(p);
 }
 
-/* Pour que l'IA puisse bouger un pion, il faut qu'elle setSelected du/des pions à bouger à 1, et qu'elle sélectionne sa case.
- Pour finir, on appellera movePaws, qui fera directement le lien entre la case choisie et le pion auparavent sélectionné*/
+/* Cette fonction intermédiaire permet de traduire la CaseGUI cliquée en son équivalent Case, puis appeller la fonction MovePawns */
 
-void Board::movePawns(CaseGUI* cGUI)
+void Board::caseGUIClicked(CaseGUI* cGUI)
 {
-    qDebug()<<"Case clicked !";
-
-    int trouve = 0;
-    int i;
-    int j;
-
     Case* c;
     /* Recherche de la case correspondant a caseGUI */
 
-    for(i=0;i<3;i++)
+    for(int i=0;i<3;i++)
     {
-        for(j=0;j<3;j++)
+        for(int j=0;j<3;j++)
         {
             if(board[i][j].getCaseNum() == cGUI->getCaseNum())
             {
@@ -94,6 +87,20 @@ void Board::movePawns(CaseGUI* cGUI)
             }
         }
     }
+
+    movePawns(c);
+}
+
+/* Pour que l'IA puisse bouger un pion, il faut qu'elle setSelected du/des pions à bouger à 1, et qu'elle sélectionne sa case.
+ Pour finir, on appellera movePaws, qui fera directement le lien entre la case choisie et le pion auparavent sélectionné*/
+
+void Board::movePawns(Case *c)
+{
+    qDebug()<<"Case clicked !";
+
+    int trouve = 0;
+    int i;
+    int j;
 
     /* On cherche pour toutes les cases, la première qui contient un pion à la caractéristique "selected" à 1. Quand on le trouve, on
      * prend automatiquement tous les pions qui sont au dessus de lui dans la liste, sans se soucier de leur statut */

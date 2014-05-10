@@ -176,7 +176,7 @@ void PoGo::makeConnections()
         for(int j=0;j<3;j++)
         {
             CaseGUI *c = &(bGUI->boardGUI[i][j]);
-            connect(c,SIGNAL(caseClicked(CaseGUI*)),b,SLOT(movePawns(CaseGUI*)));
+            connect(c,SIGNAL(caseClicked(CaseGUI*)),b,SLOT(caseGUIClicked(CaseGUI*)));
         }
     }
 
