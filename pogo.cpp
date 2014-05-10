@@ -52,7 +52,7 @@ void PoGo::startGame()
     QFont f( "Arial", 16, QFont::Bold);
     turnLabel->setFont(f);
 
-    while(!winner)
+    while (winner == 0) // while(!winner)
     {
         qDebug()<< "Tour des blancs";
         turnLabel->setText("BLANCS");
@@ -64,26 +64,30 @@ void PoGo::startGame()
 
         winner = whoWon();
 
-        qDebug()<< "Tour des noirs";
-        turnLabel->setText("NOIRS");
-        turnLabel->setStyleSheet("QLabel { color: black }");
-        b->setToMove(false);
-        pause.exec();
+        if (winner == 0) { // Arrêt dès que besoin
+            qDebug()<< "Tour des noirs";
+            turnLabel->setText("NOIRS");
+            turnLabel->setStyleSheet("QLabel { color: black }");
+            b->setToMove(false);
+            pause.exec();
 
-        qDebug()<< "Les noirs ont joue";
+            qDebug()<< "Les noirs ont joue";
 
-        winner = whoWon();
+            winner = whoWon();
+        }
+
+        qDebug() << "\t\t\t\tLE GAGNANT EST " << winner;
     }
 
-    if(winner == 1)
+    if(winner == 2)
     {
-        qDebug()<<"Les blancs ont gagne !!";
-        msgBox.setText("Les blancs ont gagne !!");
-    }
-    else if(winner == 2)
-    {
-        qDebug()<<"Les noirs on gagne !!";
+        qDebug()<<"\tLes noirs ont gagne !!";
         msgBox.setText("Les noirs ont gagne !!");
+    }
+    else if(winner == 1)
+    {
+        qDebug()<<"\tLes blancs ont gagne !!";
+        msgBox.setText("Les blancs ont gagne !!");
     }
 
     msgBox.exec();
@@ -98,14 +102,22 @@ int PoGo::whoWon()
     {
         for(int j=0;j<3;j++)
         {
-            if(b->board[i][j].pawnList.size() != 0 && b->isStackWhite(b->board[i][j].pawnList))
-            {
-                allBlack = false;
+            if (b->board[i][j].pawnList.size() > 0) {
+                if (b->isStackWhite(b->board[i][j].pawnList)) {
+                    allBlack = false;
+                } else {
+                    allWhite = false;
+                }
             }
-            else if(b->board[i][j].pawnList.size() != 0 && !(b->isStackWhite(b->board[i][j].pawnList)))
-            {
-                allWhite = false;
-            }
+
+//            if(b->board[i][j].pawnList.size() != 0 && b->isStackWhite(b->board[i][j].pawnList))
+//            {
+//                allBlack = false;
+//            }
+//            else if(b->board[i][j].pawnList.size() != 0 && !(b->isStackWhite(b->board[i][j].pawnList)))
+//            {
+//                allWhite = false;
+//            }
         }
     }
 

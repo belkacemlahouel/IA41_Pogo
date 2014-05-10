@@ -226,16 +226,20 @@ void Board::setToMove(bool b)
 
 /* Cette fonction détermine si la pile appartient au joueur noir ou au blanc */
 
-bool Board::isStackWhite(list<Pawn*> &l)
-{
-    list<Pawn*>::iterator it;
+//bool Board::isStackWhite(list<Pawn*> &l)
+//{
+//    list<Pawn*>::iterator it;
 
-    it = l.end();
-    it--;
-    Pawn *lastPawn = *it;
+//    it = l.end();
+//    it--;
+//    Pawn *lastPawn = *it;
 
-    return lastPawn->getIsWhite();
+//    return lastPawn->getIsWhite();
 
+//}
+
+bool Board::isStackWhite(list<Pawn*> &l) {
+    return (l.back())->getIsWhite();
 }
 
 /* Idem que deselectPawnsLabels, mais pour la version "modèle" de ces pions */
