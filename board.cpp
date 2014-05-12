@@ -150,9 +150,11 @@ void Board::movePawns(Case *c)
                     }
                     else
                     {
-                        if(lengthOfMovement(oldCase,c) != std::distance(toMove_iterator,oldCase->pawnList.end()))
+                        if((lengthOfMovement(oldCase,c) != std::distance(toMove_iterator,oldCase->pawnList.end())) && !((lengthOfMovement(oldCase,c) == 1) && (std::distance(toMove_iterator,oldCase->pawnList.end()) == 3) ))
                         {
-                            qDebug()<<"Mouvement impossible (mouvement different du nombre de pieces prises)";
+                            qDebug()<<"Mouvement impossible (mouvement different du nombre de pieces prises) : ";
+                            qDebug()<<"Taille de la pile : " << std::distance(toMove_iterator,oldCase->pawnList.end());
+                            qDebug()<<"Distance : " << lengthOfMovement(oldCase,c);
                         }
                         else
                         {
