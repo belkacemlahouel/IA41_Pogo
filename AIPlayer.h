@@ -13,11 +13,11 @@
 class AIPlayer : public Player {
 private:
     PrologInterface m_PrologInterface;
+    void think();
 
 public:
     AIPlayer();
-    // void startThinking();
-
+    void play();
 };
 
 #endif // AIPLAYER_H
