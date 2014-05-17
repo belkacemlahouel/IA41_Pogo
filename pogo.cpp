@@ -52,7 +52,11 @@ void PoGo::startGame()
     QFont f( "Arial", 16, QFont::Bold);
     turnLabel->setFont(f);
 
-    while (winner == 0) // while(!winner)
+    // ---------------------------------------------------------------------
+    //while (winner == 0 && bGUI->closed == false) // while(!winner)
+    // ---------------------------------------------------------------------
+
+    while (winner == 0)
     {
         qDebug()<< "Tour des blancs";
         turnLabel->setText("BLANCS");

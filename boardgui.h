@@ -22,6 +22,16 @@ class BoardGUI : public QWidget
         // A METTRE EN PRIVE :
         CaseGUI **boardGUI;
 
+// ---------------------------------------------------------------------
+//        // Closing the programm after closing the main window
+//        bool closed = false;
+
+//    protected:
+//        // Closing the programm after closing the main window
+//        void closeEvent(QCloseEvent*);
+// ---------------------------------------------------------------------
+
+
     signals:
         void moveFinished();
 
