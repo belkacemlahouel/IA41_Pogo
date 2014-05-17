@@ -1,9 +1,9 @@
 #include "HumanPlayer.h"
 
-HumanPlayer::HumanPlayer(bool c) {
-    color = c;
+HumanPlayer::HumanPlayer(bool isW) {
+    isWhite = isW;
 }
 
-void HumanPlayer::play() {
-
+void HumanPlayer::play(QEventLoop* pause) {
+    pause->exec();
 }

@@ -6,7 +6,7 @@
 class HumanPlayer : public Player {
 public:
     HumanPlayer(bool);
-    void play();
+    void play(QEventLoop*);
 };
 
 #endif // HUMANPLAYER_H

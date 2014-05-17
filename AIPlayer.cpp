@@ -5,8 +5,9 @@
 // Initialization of the Prolog Interface
 // "prgp.exe" is the program we will get after adding Prolog predicates
 // -------------------------------------------------------------------------
-AIPlayer::AIPlayer() {
+AIPlayer::AIPlayer(bool isW) {
     m_PrologInterface.init("prgp.exe");
+    isWhite = isW;
 }
 
 // -------------------------------------------------------------------------
@@ -20,6 +21,28 @@ void AIPlayer::think() {
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // hresponse : liste prolog
 // response  : c'est des vectors c++

@@ -8,7 +8,7 @@
 // -------------------------------------------------------------------------
 
 #include "PrologInterface.h"
-#include "player.h"
+#include "Player.h"
 
 class AIPlayer : public Player {
 private:
@@ -16,7 +16,8 @@ private:
     void think();
 
 public:
-    AIPlayer();
+    int level;
+    AIPlayer(bool);
     void play();
 };
 

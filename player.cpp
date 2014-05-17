@@ -1,22 +1,9 @@
-#include "player.h"
+#include "Player.h"
 
-Player::Player()
-{
-    this->isAI = false;
+void Player::play(QEventLoop* pause) {
+    pause->exec();
 }
 
-Player::Player(bool _isAI)
-{
-    this->isAI = _isAI;
-}
-
-bool Player::getIsAI()
-{
-    return this->isAI;
-}
-
-
-void Player::setIsAI(bool _isAI)
-{
-    this->isAI;
+void Player::setLevel(int lvl) {
+    level = max(0, min(3, lvl)); // 0 <= level <= 3
 }

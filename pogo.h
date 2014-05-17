@@ -1,12 +1,16 @@
 #ifndef POGO_H
 #define POGO_H
 
-#include <board.h>
-#include <boardgui.h>
-#include <player.h>
-#include <optionmenu.h>
 #include <QEventLoop>
 #include <QMessageBox>
+
+#include "board.h"
+#include "boardgui.h"
+#include "player.h"
+#include "optionmenu.h"
+#include "Player.h"
+#include "AIPlayer.h"
+#include "HumanPlayer.h"
 
 /* La classe PoGo est la classe maîtresse du jeu, c'est elle qui determine qui joue a quel moment, et quand le jeu se finit */
 

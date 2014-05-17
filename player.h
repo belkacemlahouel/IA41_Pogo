@@ -2,21 +2,17 @@
 #define PLAYER_H
 
 #include "board.h"
+#include <QEventLoop>
 
 class Player {
 protected:
-    bool color;
+    bool isWhite;
     Board* board;
-    bool isAI;
+    int level;
 
 public:
-    void play();
-    Player();
-
-    // Deprecated: you should use inheritance
-    Player(bool _isAI);
-    bool getIsAI();
-    void setIsAI(bool _isAI);
+    virtual void play(QEventLoop*);
+    void setLevel(int);
 };
 
 #endif // PLAYER_H
