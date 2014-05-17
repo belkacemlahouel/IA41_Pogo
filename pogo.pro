@@ -6,13 +6,14 @@ SOURCES += \
     case.cpp \
     board.cpp \
     pogo.cpp \
-    player.cpp \
     optionmenu.cpp \
     pawn.cpp \
     casegui.cpp \
     boardgui.cpp \
     PrologInterface.cpp \
-    AIPlayer.cpp
+    AIPlayer.cpp \
+    Player.cpp \
+    HumanPlayer.cpp
 
 OTHER_FILES +=
 
@@ -24,7 +25,6 @@ HEADERS += \
     case.h \
     board.h \
     pogo.h \
-    player.h \
     optionmenu.h \
     pawn.h \
     casegui.h \
@@ -33,4 +33,6 @@ HEADERS += \
     Types.h \
     SWI-cpp.h \
     SWI-Prolog.h \
-    AIPlayer.h
+    AIPlayer.h \
+    Player.h \
+    HumanPlayer.h
