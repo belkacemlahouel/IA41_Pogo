@@ -20,6 +20,5 @@
 *.out
 *.app
 
-pogo.pro.user.017586b
-pogo.pro.user
-pogo.pro.user.6675c8c
+# Qt Creator project files
+pogo.pro.user*
