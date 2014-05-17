@@ -11,7 +11,8 @@ SOURCES += \
     pawn.cpp \
     casegui.cpp \
     boardgui.cpp \
-    PrologInterface.cpp
+    PrologInterface.cpp \
+    AIPlayer.cpp
 
 OTHER_FILES +=
 
@@ -31,4 +32,5 @@ HEADERS += \
     PrologInterface.h \
     Types.h \
     SWI-cpp.h \
-    SWI-Prolog.h
+    SWI-Prolog.h \
+    AIPlayer.h
