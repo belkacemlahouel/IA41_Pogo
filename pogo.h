@@ -8,7 +8,7 @@
 #include <QEventLoop>
 #include <QMessageBox>
 
-/* La classe PoGo est la classe maitraisse du jeu, c'est elle qui determine qui joue a quel moment, et quand le jeu se finit */
+/* La classe PoGo est la classe maîtresse du jeu, c'est elle qui determine qui joue a quel moment, et quand le jeu se finit */
 
 class PoGo : public QWidget
 {

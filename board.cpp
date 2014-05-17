@@ -4,7 +4,7 @@ Board::Board()
 {
     this->isWhiteToMove = true;
 
-    /* Creation des cases et de leur version graphique */
+    /* Creation des cases et de leurs versions graphiques */
     this->board = new Case*[3];
 
     for (int i = 0; i < 3; ++i)

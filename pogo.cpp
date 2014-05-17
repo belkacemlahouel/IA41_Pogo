@@ -61,6 +61,15 @@ void PoGo::startGame()
         qDebug()<< "Tour des blancs";
         turnLabel->setText("BLANCS");
         turnLabel->setStyleSheet("QLabel { color: white }");
+
+        // -----------------------------------------------------------------
+        // If WHITE (BLACK) is an AI Player, then we call Prolog predicates
+        // Else, we let the Human Player choose the way he is going to play
+        // All of that is done in the instanciation of the Player
+        // We use inheritance for transparency here
+        // Player <-- {HumanPlayer, AIPlayer}
+        // -----------------------------------------------------------------
+
         b->setToMove(true);
         pause.exec();
 

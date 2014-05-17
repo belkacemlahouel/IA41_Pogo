@@ -10,7 +10,8 @@ SOURCES += \
     optionmenu.cpp \
     pawn.cpp \
     casegui.cpp \
-    boardgui.cpp
+    boardgui.cpp \
+    PrologInterface.cpp
 
 OTHER_FILES +=
 
@@ -26,4 +27,8 @@ HEADERS += \
     optionmenu.h \
     pawn.h \
     casegui.h \
-    boardgui.h
+    boardgui.h \
+    PrologInterface.h \
+    Types.h \
+    SWI-cpp.h \
+    SWI-Prolog.h
