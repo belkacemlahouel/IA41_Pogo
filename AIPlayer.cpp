@@ -22,6 +22,16 @@ void AIPlayer::think() {
     }
 }
 
+// -------------------------------------------------------------------------
+// After getting the result from Prolog
+// We have the index and the n° of the case of the pawn -> we move it
+// We use setSelected and movePawn from Pawn
+// And we move it to the case Prolog gave us
+// -------------------------------------------------------------------------
+void AIPlayer::play(QEventLoop* ev) {
+
+}
+
 
 
 
