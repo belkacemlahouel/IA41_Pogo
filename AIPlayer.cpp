@@ -22,7 +22,6 @@ AIPlayer::AIPlayer(bool isW) {
 // think([ETAT], cJoueur, [nCaseDepart, nCaseArrivee, indexPionStack]).
 // -------------------------------------------------------------------------
 void AIPlayer::think() {
-<<<<<<< HEAD
     if (m_PrologInterface.start("thinktmp", 3)) {
         // On suppose qu'on a l'état comme il faut dans un format C++
         int etat[21]; /*...*/
@@ -52,43 +51,73 @@ void AIPlayer::think() {
         }
 
         m_PrologInterface.finish();
-=======
-    // hresponse : liste prolog
-    // response  : c'est des vectors c++
-    // stimulus data
-    // think ; etat, action à faire (listes)
-    // afficher response[0]
 
-    if (m_PrologInterface.start("think", 5)) {
-        // Board creation in Prolog format
-        int plBoard[21], n = 0;
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                Case* ca = &(board->board[i][j]);
-
-                list<Pawn*>* pawns = &(ca->pawnList);
-                list<Pawn*>::iterator it;
-
-                for (it = pawns->end(); it != pawns->begin(); --it) {   // k != ... ?
-
-                    // for (int k = pawns.size-1; k >= 0; --k) {          // Stack style
-                    /*if (board[i][j]->pawnList.get(k).getIsWhite())*/
-
-                    Pawn* tmp = *it;
-                    if (tmp->getIsWhite())       plBoard[n] = 0; // White pawn
-                    else                         plBoard[n] = 1; // Black pawn
-                }
-                plBoard[n] = -1;                                                   // Next case
-                ++ n;
-            }
-        }
-
-        // Player color in Prolog format
-
-        // The others parameters are (normally) returned by Prolog...
->>>>>>> e4f08a6f3d30bb8e4b1d4841ec15a26c5e4e2116
     }
 }
+
+// -------------------------------------------------------------------------
+//void AIPlayer::think() {
+//>>>>>>> e4f08a6f3d30bb8e4b1d4841ec15a26c5e4e2116
+//    // hresponse : liste prolog
+//    // response  : c'est des vectors c++
+//    // stimulus data
+//    // think ; etat, action à faire (listes)
+//    // afficher response[0]
+
+//    if (m_PrologInterface.start("think", 5)) {
+//        // Board creation in Prolog format
+//        int plBoard[21], n = 0;
+//        for (int i = 0; i < 3; ++i) {
+//            for (int j = 0; j < 3; ++j) {
+//                Case* ca = &(board->board[i][j]);
+//<<<<<<< HEAD
+
+//                list<Pawn*>* pawns = &(ca->pawnList);
+//                list<Pawn*>::iterator it;
+
+//                for (it = pawns->end(); it != pawns->begin(); --it) {   // k != ... ?
+
+//                    // for (int k = pawns.size-1; k >= 0; --k) {          // Stack style
+//                    /*if (board[i][j]->pawnList.get(k).getIsWhite())*/
+
+//                    Pawn* tmp = *it;
+//                    if (tmp->getIsWhite())       plBoard[n] = 0; // White pawn
+//                    else                         plBoard[n] = 1; // Black pawn
+//                }
+//                plBoard[n] = -1;                                                   // Next case
+//                ++ n;
+//            }
+//        }
+
+//        // Player color in Prolog format
+
+//        // The others parameters are (normally) returned by Prolog...
+//>>>>>>> e4f08a6f3d30bb8e4b1d4841ec15a26c5e4e2116
+//=======
+
+//                list<Pawn*>* pawns = &(ca->pawnList);
+//                list<Pawn*>::iterator it;
+
+//                for (it = pawns->end(); it != pawns->begin(); --it) {   // k != ... ?
+
+//                    // for (int k = pawns.size-1; k >= 0; --k) {          // Stack style
+//                    /*if (board[i][j]->pawnList.get(k).getIsWhite())*/
+
+//                    Pawn* tmp = *it;
+//                    if (tmp->getIsWhite())       plBoard[n] = 0; // White pawn
+//                    else                         plBoard[n] = 1; // Black pawn
+//                }
+//                plBoard[n] = -1;                                                   // Next case
+//                ++ n;
+//            }
+//        }
+
+//        // Player color in Prolog format
+
+//        // The others parameters are (normally) returned by Prolog...
+//>>>>>>> e4f08a6f3d30bb8e4b1d4841ec15a26c5e4e2116
+//    }
+//}
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
@@ -104,6 +133,13 @@ void AIPlayer::think() {
 void AIPlayer::play(QEventLoop* ev) {
 
 }
+
+
+
+
+
+
+
 
 
 
