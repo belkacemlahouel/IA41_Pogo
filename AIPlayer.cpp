@@ -16,8 +16,21 @@ AIPlayer::AIPlayer() {
 //      nCaseStart, idxPawn, nCaseEnd, Board, colorPawn
 // -------------------------------------------------------------------------
 void AIPlayer::think() {
-    if (m_PrologInterface.start("think", 5)) {
+    if (m_PrologInterface.start("thinktmp", 5)) {
+        term_t hNCaseDepart;
+        term_t hNCaseArrivee;
+        term_t hIndexPion;
 
+        term_t stimulus_list = (m_PrologInterface.funcNewTermRef)();
+
+
+        if (m_PrologInterface.call()) {
+            int nCaseDepart = m_PrologInterface.FirstTerm;
+            int nCaseArrivee = m_PrologInterface.FirstTerm;
+            int indexPion = m_PrologInterface.FirstTerm;
+        }
+
+        m_PrologInterface.finish();
     }
 }
 
