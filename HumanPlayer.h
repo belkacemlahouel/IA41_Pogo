@@ -1,12 +1,12 @@
 #ifndef HUMANPLAYER_H
 #define HUMANPLAYER_H
 
-#include "Player.h"
+#include "player.h"
 
 class HumanPlayer : public Player {
 public:
     HumanPlayer(bool);
-    void play();
+    void play(QEventLoop*);
 };
 
 #endif // HUMANPLAYER_H

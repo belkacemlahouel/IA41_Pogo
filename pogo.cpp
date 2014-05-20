@@ -1,4 +1,4 @@
-#include <pogo.h>
+#include "pogo.h"
 
 PoGo::PoGo(QWidget *parent) : QWidget(parent)
 {
@@ -16,8 +16,7 @@ PoGo::PoGo(QWidget *parent) : QWidget(parent)
     this->show();
 }
 
-PoGo::PoGo(QWidget *parent,bool WhiteIsIa, bool BlackIsIa, int WhiteIaLevel, int BlackIaLevel) : QWidget(parent)
-{
+PoGo::PoGo(QWidget *parent,bool wAI, bool bAI, int wLvl, int bLvl) : QWidget(parent) {
     this->b = new Board();
     this->bGUI = new BoardGUI(this);
 
@@ -28,10 +27,30 @@ PoGo::PoGo(QWidget *parent,bool WhiteIsIa, bool BlackIsIa, int WhiteIaLevel, int
 
     this->setFixedSize(490, 540);
 
-    this->whitePlayer.setIsAI(WhiteIsIa);
-    this->blackPlayer.setIsAI(BlackIsIa);
-    this->blackIAPower = BlackIaLevel;
-    this->whiteIAPower = WhiteIaLevel;
+//    this->whitePlayer.setIsAI(WhiteIsIa);
+//    this->blackPlayer.setIsAI(BlackIsIa);
+//    this->blackIAPower = BlackIaLevel;
+//    this->whiteIAPower = WhiteIaLevel;
+
+    // ---------------------------------------------------------------------
+    if (wAI) {
+        AIPlayer tmp_player(true);
+        whitePlayer = tmp_player;
+        whitePlayer.setLevel(wLvl);
+    } else {
+        HumanPlayer tmp_player(true);
+        whitePlayer = tmp_player;
+    }
+
+    if (bAI) {
+        AIPlayer tmp_player(false);
+        blackPlayer = tmp_player;
+        blackPlayer.setLevel(bLvl);
+    } else {
+        HumanPlayer tmp_player(false);
+        blackPlayer = tmp_player;
+    }
+    // ---------------------------------------------------------------------
 
     QPalette p;
     p = this->palette();
@@ -70,8 +89,11 @@ void PoGo::startGame()
         // Player <-- {HumanPlayer, AIPlayer}
         // -----------------------------------------------------------------
 
+        // -----------------------------------------------------------------
         b->setToMove(true);
-        pause.exec();
+        // pause.exec();
+        whitePlayer.play(&pause);
+        // -----------------------------------------------------------------
 
         qDebug()<< "Les blancs ont joue";
 
@@ -122,15 +144,6 @@ int PoGo::whoWon()
                     allWhite = false;
                 }
             }
-
-//            if(b->board[i][j].pawnList.size() != 0 && b->isStackWhite(b->board[i][j].pawnList))
-//            {
-//                allBlack = false;
-//            }
-//            else if(b->board[i][j].pawnList.size() != 0 && !(b->isStackWhite(b->board[i][j].pawnList)))
-//            {
-//                allWhite = false;
-//            }
         }
     }
 

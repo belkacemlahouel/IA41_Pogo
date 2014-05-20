@@ -39,6 +39,7 @@ Board::Board()
     /* Connexion des pawns au plateau */
 
     list<Pawn*>::iterator it2;
+    // vector<Pawn*>::iterator it2;
 
     for(int i=0;i<3;i++)
     {
@@ -109,6 +110,9 @@ void Board::movePawns(Case *c)
 
     list<Pawn*>::iterator it;
     list<Pawn*>::iterator toMove_iterator;
+//    vector<Pawn*>::iterator it;
+//    vector<Pawn*>::iterator toMove_iterator;
+
     Case* oldCase;
 
         for(i=0;i<3;i++)

@@ -10,14 +10,16 @@
 #include "PrologInterface.h"
 #include "player.h"
 
+
 class AIPlayer : public Player {
 private:
     PrologInterface m_PrologInterface;
     void think();
 
 public:
-    AIPlayer();
-    void play();
+    int level;
+    AIPlayer(bool);
+    void play(QEventLoop*);
 };
 
 #endif // AIPLAYER_H
