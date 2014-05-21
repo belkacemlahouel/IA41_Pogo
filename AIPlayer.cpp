@@ -155,6 +155,8 @@ void AIPlayer::play(QEventLoop* pause) {
     // On lui indique le pointeur sur la nouvelle case
     qDebug() << "\t\t\t\t\t\t\tMOVE PION";
 
+
+    // void BoardGUI::movePawnLabels(Case* oldCase,Case* dest) ?
     board->movePawns(&(board->board[iA][jA]));
 
     // On déselectionne ? Ou est ce que c'est fait auto ?
