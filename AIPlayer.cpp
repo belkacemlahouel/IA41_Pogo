@@ -68,10 +68,15 @@ void AIPlayer::think() {
         if (m_PrologInterface.call()) {
             std::vector<int> reponse;
             m_PrologInterface.getList(hReponse, reponse);
+
+            // Enregistrement des infos dans les attributs du joueur
+            nCaseDepart = reponse[0];
+            nCaseArrivee = reponse[1];
+            indexPionStack = reponse[2];
         }
 
         m_PrologInterface.finish();
-
+        // On a finit de "réfléchir"
     }
 }
 
@@ -81,6 +86,42 @@ void AIPlayer::think() {
 // We use setSelected and movePawn from Pawn
 // And we move it to the case Prolog gave us
 // -------------------------------------------------------------------------
-void AIPlayer::play(QEventLoop* ev) {
+void AIPlayer::play(QEventLoop* pause) {
+    pause->exec(); // Mets en pause et attends pour le coup du joueur
 
+    // On appelle la réflexion via Prolog
+    think();
+
+    // On récupère le pion et on le sélectionne ############################
+    Pawn* selectedPawn;
+    list<Pawn*>::iterator it;
+    int k = 1;
+    int iD, jD;
+    int iA, jA; // Coordonnées des cases de Départ/Arrivée, à la mode c++
+
+    // Attention2 : Les index des cases commencent à 1
+    // Calcul des coordonnées iD, jD
+    iD = (nCaseDepart-1)/3;
+    jD = (nCaseDepart-1)%3;
+
+    // Calcul des coordonnées iA, jA
+    iA = (nCaseArrivee-1)/3;
+    jA = (nCaseArrivee-1)%3;
+
+    // Attention : l'index du prédicat est en mode Stack
+    //      Dans le code c++, on utilise des listes
+    //      Par exemple, le pion 1 (Prolog) -> dernier pion de la liste
+    for (it = board->board[iD][jD].pawnList.end(); k < indexPionStack ; --it) {
+        ++k;
+    }
+    selectedPawn = *it; // Pas sur de cette ligne
+
+    selectedPawn->setSelected(true);
+
+    // Puis on le fait bouger là où il faut ################################
+    // On lui indique le pointeur sur la nouvelle case
+    board->movePawns(&(board->board[iA][jA]));
+
+    // On déselectionne ? Ou est ce que c'est fait auto ?
+    selectedPawn->setSelected(false);
 }

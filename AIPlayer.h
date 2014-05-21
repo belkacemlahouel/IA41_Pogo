@@ -9,15 +9,18 @@
 
 #include "PrologInterface.h"
 #include "player.h"
+#include <QEventLoop>
 
 
 class AIPlayer : public Player {
 private:
     PrologInterface m_PrologInterface;
+    int nCaseDepart;
+    int nCaseArrivee;
+    int indexPionStack;
     void think();
 
 public:
-    int level;
     AIPlayer(bool);
     void play(QEventLoop*);
 };
