@@ -10,7 +10,7 @@ class PawnLabel : public QLabel
 {
 Q_OBJECT
 private:
-    int selected=0;
+    int selected;
     QPixmap pic;
     QPixmap selectpic;
 

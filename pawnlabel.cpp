@@ -7,6 +7,8 @@ PawnLabel::PawnLabel(QWidget * parent,bool isWhite) : QLabel(parent)
     QPixmap pnSelect;
     QPixmap pbSelect;
 
+    selected = 0; // Ajout ici pour suppression de warnings au lieu du .h
+
     if(!pn.load(":/new/images/pion_noir.png")){
         qWarning("Failed to load pion_noir.png");
     }
@@ -35,8 +37,9 @@ PawnLabel::PawnLabel(QWidget * parent,bool isWhite) : QLabel(parent)
 
 void PawnLabel::pawnClicked()
 {
-    // gérer la sélection avec une classe plus haute. Quand on clique sur un pion -> parcourir
-    // ceux plus loin dans la liste et tous les sélectionner
+    // gérer la sélection avec une classe plus haute.
+    // Quand on clique sur un pion -> parcourir ceux plus loin dans la liste
+    // et tous les sélectionner
 
     if(!selected){
         selected=1;

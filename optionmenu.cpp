@@ -1,6 +1,7 @@
 #include "optionmenu.h"
 
-/* La fenêtre d'option est codée et designée en dur, c'est pourquoi le code est long */
+// La fenêtre d'option est codée et designée en dur
+// c'est pourquoi le code est long
 
 OptionMenu::OptionMenu(QWidget *parent) : QWidget(parent)
 {    
@@ -73,7 +74,8 @@ OptionMenu::OptionMenu(QWidget *parent) : QWidget(parent)
 
  void OptionMenu::handleButton()
  {
-    //TODO : Gérer les infos des boutons, injecter ça dans PoGo, et démarrer le jeu !!
+    // TODO : Gérer les infos des boutons, injecter ça dans PoGo
+    // et démarrer le jeu !!
     qDebug()<<"Bouton presse. Prise en compte des options...";
     this->WhiteIALevel = this->liste1->currentIndex() + 1;
     this->BlackIALevel = this->liste2->currentIndex() + 1;
@@ -81,11 +83,17 @@ OptionMenu::OptionMenu(QWidget *parent) : QWidget(parent)
     this->WhiteIA = whiteChoiceIa->isChecked();
     this->BlackIA = blackChoiceIa->isChecked();
 
-    qDebug()<<"Options du jeu : Blancs IA ? " << WhiteIA << " Noirs IA ? " << BlackIA << "Niveaux respectifs (si IA) : " << WhiteIALevel << " " << BlackIALevel;
+    qDebug()<<"Options du jeu : Blancs IA ? " << WhiteIA << " Noirs IA ? "
+           << BlackIA << "Niveaux respectifs (si IA) : "
+           << WhiteIALevel << " " << BlackIALevel;
+
     qDebug()<<"Demarrage du jeu !!!";
 
     PoGo *pg = new PoGo(NULL,WhiteIA,BlackIA,WhiteIALevel,BlackIALevel);
     this->close();
     pg->startGame();
-    qDebug()<<"Le jeu tourne."; // Est-ce que ça veut dire que le jeu est FINI ? Le msg n'est affiché que dans ce cas
+
+    qDebug()<<"Le jeu tourne.";
+    // Est-ce que ça veut dire que le jeu est FINI ?
+    // Le msg n'est affiché que dans ce cas
  }

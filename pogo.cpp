@@ -117,12 +117,12 @@ void PoGo::startGame()
     if(winner == 2)
     {
         qDebug()<<"\tLes noirs ont gagne !!";
-        msgBox.setText("Les noirs ont gagne !!");
+        msgBox.setText("Les noirs ont gagné !!");
     }
     else if(winner == 1)
     {
         qDebug()<<"\tLes blancs ont gagne !!";
-        msgBox.setText("Les blancs ont gagne !!");
+        msgBox.setText("Les blancs ont gagné !!");
     }
 
     msgBox.exec();
