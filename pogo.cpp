@@ -38,16 +38,14 @@ PoGo::PoGo(QWidget *parent,bool wAI, bool bAI, int wLvl, int bLvl) : QWidget(par
     // ---------------------------------------------------------------------
     if (wAI) {
         // qDebug() << "\t\t#####wP is AI\n";
-        whitePlayer = new AIPlayer(true);
-        whitePlayer->setLevel(wLvl);
+        whitePlayer = new AIPlayer(true, wLvl, b);
     } else {
         whitePlayer = new HumanPlayer(true);
     }
 
     if (bAI) {
         // qDebug() << "\t\t#####bP is AI\n";
-        blackPlayer = new AIPlayer(false);
-        blackPlayer->setLevel(bLvl);
+        blackPlayer = new AIPlayer(false, bLvl, b);
     } else {
         blackPlayer = new HumanPlayer(false);
     }
@@ -186,7 +184,12 @@ void PoGo::makeConnections()
                 Pawn *temp = *pawnIt;
                 PawnLabel *tempLabel = *labelIt;
 
+                // Connexion PawnLabel (cliqué) -> Pawn (selectionné)
                 connect(tempLabel,SIGNAL(clicked()),temp,SLOT(labelClicked()));
+
+                // Connexion Pawn (selectionné) -> PawnLabel (cliqué)
+                // Les deux méthodes indiquent ce qui s'est passé/ce qui va se passer
+                connect(temp, SIGNAL(pawnSelected()), tempLabel, SLOT(pawnLabelClicked()));
 
                 pawnIt++;
                 labelIt++;

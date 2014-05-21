@@ -28,6 +28,7 @@ signals:
 
 public slots:
     void pawnClicked();
+    void pawnLabelClicked();
 
 protected:
     void mousePressEvent ( QMouseEvent * event ) ;

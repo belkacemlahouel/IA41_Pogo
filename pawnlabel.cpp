@@ -75,3 +75,9 @@ void PawnLabel::setSelected(int select)
         this->setPixmap(this->pic);
     }
 }
+
+// ----------------------------------------------------
+void PawnLabel::pawnLabelClicked() {
+    setSelected(1);
+}
+// ----------------------------------------------------

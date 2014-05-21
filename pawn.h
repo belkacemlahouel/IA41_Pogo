@@ -18,6 +18,7 @@ public:
 
 signals:
     void deselectOthers(Pawn *p);
+    void pawnSelected();
 
 public slots:
     void labelClicked();

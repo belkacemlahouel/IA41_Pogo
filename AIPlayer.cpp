@@ -5,10 +5,12 @@
 // Initialization of the Prolog Interface
 // "prgp.exe" is the program we will get after adding Prolog predicates
 // -------------------------------------------------------------------------
-AIPlayer::AIPlayer(bool isW) {
+AIPlayer::AIPlayer(bool isW, int lvl, Board* b) {
     qDebug() << "\t\t\t\t\t\tINSTANCIATION AI\n";
     m_PrologInterface.init("prgp.exe");
     isWhite = isW;
+    level = max(0, min(3, lvl)); // 0 <= level <= 3
+    board = b;
 }
 
 // -------------------------------------------------------------------------
@@ -146,10 +148,13 @@ void AIPlayer::play(QEventLoop* pause) {
 
     qDebug() << "\t\t\t\t\t\t\tSELECT PION";
 
-    selectedPawn->setSelected(true);
+    selectedPawn->setSelected(1);
+    // Il faut mettre à jour pawnlabel
 
     // Puis on le fait bouger là où il faut ################################
     // On lui indique le pointeur sur la nouvelle case
+    qDebug() << "\t\t\t\t\t\t\tMOVE PION";
+
     board->movePawns(&(board->board[iA][jA]));
 
     // On déselectionne ? Ou est ce que c'est fait auto ?

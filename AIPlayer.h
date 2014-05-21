@@ -18,10 +18,11 @@ private:
     int nCaseDepart;
     int nCaseArrivee;
     int indexPionStack;
+    int level;
     void think();
 
 public:
-    AIPlayer(bool);
+    AIPlayer(bool, int, Board*);
     void play(QEventLoop*);
 };
 

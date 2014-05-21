@@ -14,6 +14,10 @@ int Pawn::getSelected()
 void Pawn::setSelected(int select)
 {
     this->selected = select;
+
+    // ------
+    emit pawnSelected();
+    // ------
 }
 
 bool Pawn::getIsWhite()
@@ -34,3 +38,13 @@ void Pawn::labelClicked()
 
     emit deselectOthers(this);
 }
+
+// --------------------------------------------------------
+//void Pawn::pawnSelected() {
+//    if (selected) {
+//        qDebug() << "Pawn Selected from AI : " << selected;
+//        emit pawnLabelClicked();
+//    }
+//}
+// --------------------------------------------------------
+

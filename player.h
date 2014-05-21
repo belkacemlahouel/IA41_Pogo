@@ -8,11 +8,9 @@ class Player {
 protected:
     bool isWhite;
     Board* board;
-    int level;
 
 public:
     virtual void play(QEventLoop*) = 0;
-    void setLevel(int);
 };
 
 #endif // PLAYER_H
