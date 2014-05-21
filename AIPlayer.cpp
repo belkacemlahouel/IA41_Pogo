@@ -13,7 +13,7 @@ AIPlayer::AIPlayer(bool isW) {
 // -------------------------------------------------------------------------
 // Using Prolog predicates to think
 // "think " is the name of the predicate we will use
-// "3" is the number of parameters for "think":
+// "3" is the number of parameters for "think"
 // -------------------------------------------------------------------------
 // think([ETAT], cJoueur, [nCaseDepart, nCaseArrivee, indexPionStack]).
 // -------------------------------------------------------------------------
@@ -50,8 +50,13 @@ void AIPlayer::think() {
         m_PrologInterface.consList(m_PrologInterface.FirstTerm, hEtat);
 
 
+        // On pourrait se débrouiller pour mettre ça dans l'état
         int cPlayer[1];
-        cPlayer[0] = 1; /*...Récupération du programme...*/
+
+        // Récupération des infos du joueur : couleur
+        if (isWhite) cPlayer[0] = 1;
+        else         cPlayer[0] = 0;
+
         term_t hCPlayer = (m_PrologInterface.funcNewTermRef)();
         m_PrologInterface.putList(hCPlayer, 1, cPlayer);
         term_t ptrTerm = m_PrologInterface.FirstTerm+1;
