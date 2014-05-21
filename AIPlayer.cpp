@@ -6,6 +6,7 @@
 // "prgp.exe" is the program we will get after adding Prolog predicates
 // -------------------------------------------------------------------------
 AIPlayer::AIPlayer(bool isW) {
+    qDebug() << "\t\t\t\t\t\tINSTANCIATION AI\n";
     m_PrologInterface.init("prgp.exe");
     isWhite = isW;
 }
@@ -87,10 +88,20 @@ void AIPlayer::think() {
 // And we move it to the case Prolog gave us
 // -------------------------------------------------------------------------
 void AIPlayer::play(QEventLoop* pause) {
-    pause->exec(); // Mets en pause et attends pour le coup du joueur
+    qDebug() << "\t\t\t\t\t\tAIPLAYER::PLAY";
+
+    // pause->exec(); // Mets en pause et attends pour le coup du joueur
 
     // On appelle la réflexion via Prolog
-    think();
+    // think();
+
+        /* ********************* */
+        // Supposons le prédicat Prolog appelé et les résultats obtenus
+        // On suppose que le coup est possible
+        nCaseDepart = 1;
+        nCaseArrivee = 2;
+        indexPionStack = 1;
+        /* ********************* */
 
     // On récupère le pion et on le sélectionne ############################
     Pawn* selectedPawn;
@@ -98,6 +109,8 @@ void AIPlayer::play(QEventLoop* pause) {
     int k = 1;
     int iD, jD;
     int iA, jA; // Coordonnées des cases de Départ/Arrivée, à la mode c++
+
+    qDebug() << "\t\t\t\t\t\t\tCALCULS COORD";
 
     // Attention2 : Les index des cases commencent à 1
     // Calcul des coordonnées iD, jD
@@ -108,13 +121,30 @@ void AIPlayer::play(QEventLoop* pause) {
     iA = (nCaseArrivee-1)/3;
     jA = (nCaseArrivee-1)%3;
 
+    qDebug() << "\t\t\t\t\t\t\tCOORD: " << iD << ", " << jD << " --> "
+                                        << iA << ", " << jA;
+
+
+    qDebug() << "\t\t\t\t\t\t\tSEARCHING PAWN";
+
     // Attention : l'index du prédicat est en mode Stack
     //      Dans le code c++, on utilise des listes
     //      Par exemple, le pion 1 (Prolog) -> dernier pion de la liste
-    for (it = board->board[iD][jD].pawnList.end(); k < indexPionStack ; --it) {
+    // for (it = board->board[iD][jD].pawnList.end(); k < indexPionStack ; --it) {
+    it = board->board[iD][jD].pawnList.end();
+    --it;
+    qDebug() << "\t\t\t\t\t\t\tLAUCHING SEARCH";
+    while (k < indexPionStack) {
         ++k;
+        --it;
+        qDebug() << "NEXT";
     }
+
+    qDebug() << "\t\t\t\t\t\t\tFOUND PAWN";
+
     selectedPawn = *it; // Pas sur de cette ligne
+
+    qDebug() << "\t\t\t\t\t\t\tSELECT PION";
 
     selectedPawn->setSelected(true);
 

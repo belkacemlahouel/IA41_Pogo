@@ -11,7 +11,7 @@ protected:
     int level;
 
 public:
-    virtual void play(QEventLoop*);
+    virtual void play(QEventLoop*) = 0;
     void setLevel(int);
 };
 

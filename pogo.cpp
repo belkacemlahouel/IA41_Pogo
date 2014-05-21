@@ -32,23 +32,24 @@ PoGo::PoGo(QWidget *parent,bool wAI, bool bAI, int wLvl, int bLvl) : QWidget(par
 //    this->blackIAPower = BlackIaLevel;
 //    this->whiteIAPower = WhiteIaLevel;
 
+    whitePlayer = NULL;
+    blackPlayer = NULL;
+
     // ---------------------------------------------------------------------
     if (wAI) {
-        AIPlayer tmp_player(true);
-        whitePlayer = tmp_player;
-        whitePlayer.setLevel(wLvl);
+        // qDebug() << "\t\t#####wP is AI\n";
+        whitePlayer = new AIPlayer(true);
+        whitePlayer->setLevel(wLvl);
     } else {
-        HumanPlayer tmp_player(true);
-        whitePlayer = tmp_player;
+        whitePlayer = new HumanPlayer(true);
     }
 
     if (bAI) {
-        AIPlayer tmp_player(false);
-        blackPlayer = tmp_player;
-        blackPlayer.setLevel(bLvl);
+        // qDebug() << "\t\t#####bP is AI\n";
+        blackPlayer = new AIPlayer(false);
+        blackPlayer->setLevel(bLvl);
     } else {
-        HumanPlayer tmp_player(false);
-        blackPlayer = tmp_player;
+        blackPlayer = new HumanPlayer(false);
     }
     // ---------------------------------------------------------------------
 
@@ -91,8 +92,8 @@ void PoGo::startGame()
 
         // -----------------------------------------------------------------
         b->setToMove(true);
-        // pause.exec();
-        whitePlayer.play(&pause);
+//        pause.exec();
+        whitePlayer->play(&pause);
         // -----------------------------------------------------------------
 
         qDebug()<< "Les blancs ont joue";
@@ -103,8 +104,10 @@ void PoGo::startGame()
             qDebug()<< "Tour des noirs";
             turnLabel->setText("NOIRS");
             turnLabel->setStyleSheet("QLabel { color: black }");
+
             b->setToMove(false);
-            pause.exec();
+            // pause.exec();
+            blackPlayer->play(&pause);
 
             qDebug()<< "Les noirs ont joue";
 

@@ -20,8 +20,8 @@ class PoGo : public QWidget
 private:
     Board *b;
     BoardGUI *bGUI;
-    Player whitePlayer;
-    Player blackPlayer;
+    Player* whitePlayer;
+    Player* blackPlayer;
     int whiteIAPower; // 1 = nul, 2 = bon, 3 = très bon
     int blackIAPower;
     int whoWon();
