@@ -149,6 +149,7 @@ void AIPlayer::play(QEventLoop* pause) {
     qDebug() << "\t\t\t\t\t\t\tSELECT PION";
 
     selectedPawn->setSelected(1);
+    selectedPawn->pawnSelected(); // on envoie un signal au pawnLabel correspondant
     // Il faut mettre à jour pawnlabel
 
     // Puis on le fait bouger là où il faut ################################
@@ -160,5 +161,5 @@ void AIPlayer::play(QEventLoop* pause) {
     board->movePawns(&(board->board[iA][jA]));
 
     // On déselectionne ? Ou est ce que c'est fait auto ?
-    selectedPawn->setSelected(false);
+    selectedPawn->setSelected(0);
 }

@@ -237,20 +237,6 @@ void Board::setToMove(bool b)
     this->isWhiteToMove = b;
 }
 
-/* Cette fonction détermine si la pile appartient au joueur noir ou au blanc */
-
-//bool Board::isStackWhite(list<Pawn*> &l)
-//{
-//    list<Pawn*>::iterator it;
-
-//    it = l.end();
-//    it--;
-//    Pawn *lastPawn = *it;
-
-//    return lastPawn->getIsWhite();
-
-//}
-
 bool Board::isStackWhite(list<Pawn*> &l) {
     return (l.back())->getIsWhite();
 }

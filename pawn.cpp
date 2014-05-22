@@ -14,10 +14,10 @@ int Pawn::getSelected()
 void Pawn::setSelected(int select)
 {
     this->selected = select;
+}
 
-    // ------
+void Pawn::selectCorrespondingLabel(){
     emit pawnSelected();
-    // ------
 }
 
 bool Pawn::getIsWhite()

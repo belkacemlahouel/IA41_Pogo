@@ -15,6 +15,7 @@ public:
     int getSelected();
     void setSelected(int select);
     bool getIsWhite();
+    void selectCorrespondingLabel();
 
 signals:
     void deselectOthers(Pawn *p);
