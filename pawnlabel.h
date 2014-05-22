@@ -23,12 +23,13 @@ public:
 
 
 signals:
-    void clicked();
-    void deselectOthers(PawnLabel *p);
+    void clicked(); // signal qui s'envoie avec le clic de la souris
+    void deselectOthers(PawnLabel *p); // signal envoyé au boardGUI afin de déselectionner tous les labels ne
+                                       // correspondant pas au label venant d'être cliqué
 
 public slots:
-    void pawnClicked();
-    void pawnLabelClicked();
+    void pawnClicked(); // slot qui s'active par la réception du signal lors du clic de la souris
+    void pawnLabelClicked(); // met le label à seleted = 1, appelé par le pawn correspondant
 
 protected:
     void mousePressEvent ( QMouseEvent * event ) ;

@@ -31,7 +31,7 @@ public:
 signals:
 
 private slots:
-    void handleButton();
+    void handleButton(); // lorsqu'on valide les options, ce slot reçoit un signal et gère toutes les infos rentrées dans les options
 
 };
 

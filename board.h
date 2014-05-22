@@ -26,12 +26,12 @@ public:
     Case **board;
 
 signals:
-    void moveFinished();
-    void movePawnLabelsSignal(Case *oldCase,Case* dest);
+    void moveFinished(); // Signal envoyé pour sortir de l'attente d'un mouvement (pause.exec())
+    void movePawnLabelsSignal(Case *oldCase,Case* dest); // signal envoyé à la fin de movePawns activer movePawnLabel du boardGUI
 
 public slots:
-    void caseGUIClicked(CaseGUI* cGUI);
-    void deselectPawns(Pawn *p);
+    void caseGUIClicked(CaseGUI* cGUI); // s'active lorsqu'on clique sur une caseGUI (active un mouvement)
+    void deselectPawns(Pawn *p); // envoyé par pawn, permet de déselectionner tous les pions différents du pion nouvellement sélectionné
 
 };
 

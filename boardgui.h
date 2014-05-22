@@ -33,11 +33,11 @@ class BoardGUI : public QWidget
 
 
     signals:
-        void moveFinished();
+        void moveFinished();  // jamais appelé ? A vérifier
 
     public slots:
-        void movePawnLabels(Case* oldCase, Case* dest);
-        void deselectPawnsLabels(PawnLabel *p);
+        void movePawnLabels(Case* oldCase, Case* dest); // signal reçu à la fin du movePawns du board, active le déplacement des pawnLabels correspondant
+        void deselectPawnsLabels(PawnLabel *p); // lorsqu'un label est clické, automatiquement désélectionne tous les autres
 
 };
 

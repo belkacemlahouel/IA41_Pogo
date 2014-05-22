@@ -18,11 +18,11 @@ public:
     void selectCorrespondingLabel();
 
 signals:
-    void deselectOthers(Pawn *p);
-    void pawnSelected();
+    void deselectOthers(Pawn *p); // lorsqu'un pion est sélectionné, ce signal active un slot de board qui déselectionnera les autres
+    void pawnSelected(); // lorsque l'IA sélectionne un pion, ce signal permet de sélectionner le label correspondant
 
 public slots:
-    void labelClicked();
+    void labelClicked(); // lorsque le pawnLabel est cliqué, ce slot permet de cliquer son équivalent pawn
 };
 
 #endif // PAWN_H

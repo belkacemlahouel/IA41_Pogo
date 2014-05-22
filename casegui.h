@@ -25,7 +25,7 @@ class CaseGUI : public QLabel
         std::list<PawnLabel*> pawnListGUI;
 
     signals:
-        void caseClicked(CaseGUI*);
+        void caseClicked(CaseGUI*); // signal envoyé après le déclenchement du mousePressEvent
 
     public slots:
         void mousePressEvent ( QMouseEvent * event ) ;
