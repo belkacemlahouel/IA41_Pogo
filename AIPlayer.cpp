@@ -54,14 +54,17 @@ void AIPlayer::think() {
 
 
         // On pourrait se débrouiller pour mettre ça dans l'état
-        int cPlayer[1];
+        // Contient des infos player : couleur, niveau
+        int cPlayer[2];
 
         // Récupération des infos du joueur : couleur
         if (isWhite) cPlayer[0] = 1;
         else         cPlayer[0] = 0;
 
+        cPlayer[1] = level;
+
         term_t hCPlayer = (m_PrologInterface.funcNewTermRef)();
-        m_PrologInterface.putList(hCPlayer, 1, cPlayer);
+        m_PrologInterface.putList(hCPlayer, 2, cPlayer);
         term_t ptrTerm = m_PrologInterface.FirstTerm+1;
         m_PrologInterface.consList(ptrTerm, hCPlayer);
 
@@ -116,12 +119,12 @@ void AIPlayer::play(QEventLoop* pause) {
 
     // Attention2 : Les index des cases commencent à 1
     // Calcul des coordonnées iD, jD
-    iD = (nCaseDepart-1)/3;
-    jD = (nCaseDepart-1)%3;
+    jD = (nCaseDepart-1)/3;
+    iD = (nCaseDepart-1)%3;
 
     // Calcul des coordonnées iA, jA
-    iA = (nCaseArrivee-1)/3;
-    jA = (nCaseArrivee-1)%3;
+    jA = (nCaseArrivee-1)/3;
+    iA = (nCaseArrivee-1)%3;
 
     qDebug() << "\t\t\t\t\t\t\tCOORD: " << iD << ", " << jD << " --> "
                                         << iA << ", " << jA;

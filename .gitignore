@@ -22,6 +22,7 @@
 
 # Qt Creator project files
 pogo.pro.user*
+pogo.pro.user
 
 # Qt Creator autosave
 *.autosave
