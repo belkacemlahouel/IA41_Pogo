@@ -3,6 +3,7 @@
 
 #include <QEventLoop>
 #include <QMessageBox>
+#include <QPalette>
 
 #include "board.h"
 #include "boardgui.h"

@@ -70,11 +70,7 @@ void PoGo::startGame()
     QFont f( "Arial", 16, QFont::Bold);
     turnLabel->setFont(f);
 
-    // ---------------------------------------------------------------------
-    //while (winner == 0 && bGUI->closed == false) // while(!winner)
-    // ---------------------------------------------------------------------
-
-    while (winner == 0)
+    while (winner == 0 && !isHidden()) // bGUI != NULL) // && finished == false)
     {
         qDebug()<< "Tour des blancs";
         turnLabel->setText("BLANCS");
@@ -90,11 +86,11 @@ void PoGo::startGame()
 
         // -----------------------------------------------------------------
         b->setToMove(true);
-//        pause.exec();
+        // pause.exec();
         whitePlayer->play(&pause);
         // -----------------------------------------------------------------
 
-        qDebug()<< "Les blancs ont joue";
+        qDebug()<< "Les blancs ont joué";
 
         winner = whoWon();
 
@@ -107,7 +103,7 @@ void PoGo::startGame()
             // pause.exec();
             blackPlayer->play(&pause);
 
-            qDebug()<< "Les noirs ont joue";
+            qDebug()<< "Les noirs ont joué";
 
             winner = whoWon();
         }
@@ -117,12 +113,12 @@ void PoGo::startGame()
 
     if(winner == 2)
     {
-        qDebug()<<"\tLes noirs ont gagne !!";
+        qDebug()<<"\tLes noirs ont gagné !!";
         msgBox.setText("Les noirs ont gagné !!");
     }
     else if(winner == 1)
     {
-        qDebug()<<"\tLes blancs ont gagne !!";
+        qDebug()<<"\tLes blancs ont gagné !!";
         msgBox.setText("Les blancs ont gagné !!");
     }
 
@@ -211,5 +207,5 @@ void PoGo::makeConnections()
             connect(c,SIGNAL(caseClicked(CaseGUI*)),b,SLOT(caseGUIClicked(CaseGUI*)));
         }
     }
-
 }
+

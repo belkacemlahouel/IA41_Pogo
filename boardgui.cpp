@@ -176,12 +176,3 @@ BoardGUI& BoardGUI::operator =(const BoardGUI& b){
 
     return *this;
 }
-
-// ---------------------------------------------------------------------
-//void BoardGUI::closeEvent(QCloseEvent* ev) {
-//    // ev->accept();
-//    qDebug() << "\t\t\t############ FERMETURE ############" << endl;
-//    closed = true;
-//}
-// ---------------------------------------------------------------------
-
