@@ -18,7 +18,7 @@ AIPlayer::AIPlayer(bool isW, int lvl, Board* b) {
 // "think " is the name of the predicate we will use
 // "3" is the number of parameters for "think"
 // -------------------------------------------------------------------------
-// think([ETAT], cJoueur, [nCaseDepart, nCaseArrivee, indexPionStack]).
+// think([ETAT], [cJoueur, lvlAI], [nCaseDepart, nCaseArrivee, indexPionStack]).
 // -------------------------------------------------------------------------
 void AIPlayer::think() {
     if (m_PrologInterface.start("think", 3)) {
