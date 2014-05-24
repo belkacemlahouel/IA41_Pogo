@@ -1,0 +1,30 @@
+# Contient les idées sur la fonction d'évaluation
+
+------------------- (1) -------------------------
+Sommer l'évaluation des quatres premiers pions de chaque stack
+	Si blanc = +1
+	Si noir  = -1
+On obtient l'évaluation d'un stack
+
+Puis sommer l'évaluation de toutes les stacks
+
+------------------- (2) -------------------------
+Comme (1), mais donner un poids plus important à la première pièce du stack
+	Explication : on veut une évaluation du stack
+		le stack étant possédé par un joueur, il y a moins d'intérêt à le jouer
+		cela diminuerait de beaucoup plus l'évaluation totale...
+		Impact plus important pour l'acquisition d'un stack
+
+------------------- (3) -------------------------
+Combinaison linéaire
+	- Nombre de tours contrôlées
+	- Nombre de pions qu'on peut bouger actuellement
+Ne prends pas forcément en compte le risque de laisser à l'adversaire
+	un stack , et en le laissant bouger des pions auxquels il n'avait pas accès
+
+
+
+------------------- (-) -------------------------
+Il faut réussir à compter la puissance de contrôle d'un stack
+	Combien de pions le joueur qui contrôle le stack peut-il jouer
+	(sans perdre le stack...)
