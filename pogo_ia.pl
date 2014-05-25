@@ -66,11 +66,12 @@ eval_pion(1, 1).		% pion blanc
 eval_pion(0, -1).		% pion noir
 
 % -----------------------------------------------------------------------------
-% eval1([ETAT]).
+% eval1([ETAT], EVAL).
 
-eval1(ETAT) :- eval1(ETAT, 0, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+eval1(ETAT, E) :- 	E is 0,
+			eval1(ETAT, E, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 
-eval1([], _, _).
+eval1([], _, 0).
 eval1([_|R], E, 4) :-	eval1(R, E, 4).		% Si C = 4, vers la prochaine
 eval1([-1|R], E, _) :- 	eval1(R, E, 0).		% Si on trouve un -1, C <- 0
 eval1([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
