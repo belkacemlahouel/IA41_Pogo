@@ -4,6 +4,11 @@
 # 		voir laquelle donne le plus de victoires  #
 # Contient les idées sur la fonction d'évaluation #
 
+------------------- (0) -------------------------
+	Nombre de stacks contrôlés par le joueur blanc
+(-) 	Nombre de stacks contrôlés par le joueur noir
+(=)	Evaluation du jeu en cours...
+
 ------------------- (1) -------------------------
 Sommer l'évaluation des quatres premiers pions de chaque stack
 	Si blanc = +1
@@ -32,3 +37,7 @@ Ne prends pas forcément en compte le risque de laisser à l'adversaire
 Il faut réussir à compter la puissance de contrôle d'un stack
 	Combien de pions le joueur qui contrôle le stack peut-il jouer
 	(sans perdre le stack...)
+
+Peut-être changer la fonction d'évaluation en fonction du niveau d'IA
+	Faire en sorte qu'elle soit "gentille"/agressive/passive...
+
