@@ -40,3 +40,47 @@
 % 7 8 9
 % -----------------------------------------------------------------------------
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% #############################################################################
+% Creation de fonctions d'évaluations - Voir "./idees_evaluation"
+% #############################################################################
+
+% -----------------------------------------------------------------------------
+% Base de faits : évaluation d'un pion
+% evam_pion(Pion, Evaluation)
+eval_pion(1, 1).		% pion blanc
+eval_pion(0, -1).		% pion noir
+
+% -----------------------------------------------------------------------------
+% eval1([ETAT]).
+
+eval1(ETAT) :- eval1(ETAT, 0, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+
+eval1([], _, _).
+eval1([_|R], E, 4) :-	eval1(R, E, 4).		% Si C = 4, vers la prochaine
+eval1([-1|R], E, _) :- 	eval1(R, E, 0).		% Si on trouve un -1, C <- 0
+eval1([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
+			C1 is C+1,		% On incrémente le compteur
+			E1 is E+XE,		% On mets à jour l'éval
+			eval1(R, E1, C1).	% On évalue le reste
+
+
+
+
+
+
+
