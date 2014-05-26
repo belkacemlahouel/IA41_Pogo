@@ -119,13 +119,16 @@ nouvel_etat(E, D, A, I, E1) :-  enleve_pile(E, D, I, E0, P),
 enleve_pile(E, D, I, E0, P) :-
 			enleve_pile(E, D, I, E0, P, 1, 1), !.
 
+% On s'arrête si E vide, donc P et E0 vides
+enleve_pile([], _, _, [], [], _, _) :- !.
+
 % On incrémente le compteur de cases, si -1
 enleve_pile([-1|E], D, I, [-1|E0], P, CC, CI) :-
 			CC1 is CC+1,
 			enleve_pile(E, D, I, E0, P, CC1, CI), !.
 
 % On récupère la pile si on est sur la case #D
-enleve_pile(E, D, I, [X|E0], [X|P], D, CI) :-
+enleve_pile([X|E], D, I, E0, [X|P], D, CI) :-
 			CI =< I,
 			CI1 is CI+1,
 			enleve_pile(E, D, I, E0, P, D, CI1), !.
@@ -139,10 +142,7 @@ enleve_pile(E, D, I, [X|E0], [X|P], D, CI) :-
 enleve_pile([X|E], D, I, [X|E0], P, CC, CI) :-
 			enleve_pile(E, D, I, E0, P, CC, CI), !.
 
-% On s'arrête si E vide, donc P et E0 vides
-enleve_pile([], _, _, [], [], _, _) :- !.
-
-----------
+% ----------
 
 
 % Compteur cases
