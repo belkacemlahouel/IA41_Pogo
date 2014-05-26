@@ -110,12 +110,12 @@ nouvel_etat(E, D, A, I, E1) :-  enleve_pile(E, D, I, E0, P),
 % E0 est l'état E sans la pile P située sur la case D, du 1er au pion #I (inc)
 % -----------------------------------------------------------------------------
 
-enleve_pile(E, D, I, E0, P) :- enleve_pile(E, D, I, E0, P, 1). % Compteur cases
+enleve_pile(E, D, I, E0, P) :- enleve_pile_c(E, D, I, E0, P, 1). % Compteur cases
 
 % ----- Chercher la case
 
-enleve_pile_c([-1|R], D, I, E0, P, CC) :- CC1 is CC+1,
-										  enleve_pile(R, D, I, E0, P, CC1).
+enleve_pile_c([-1|R], D, I, [-1|R0], P, CC) :- CC1 is CC+1,
+										  enleve_pile_c(R, D, I, R0, P, CC1).
 
 enleve_pile_c(E, D, I, E0, P, D) :- enleve_pile_i(E, D, I, E0, P, D, 1).
 
@@ -142,25 +142,35 @@ enleve_pile_i([X|R], D, I, E0, [X|P], CC, CI) :-
 % ----- Déplacer le pion et ceux qui sont au dessus
 % ----- Faut réorganiser l'ordre des priorités...
 
-% Compteur de cases ajouté
-insere_pile(E0, P, A, E1) :- insere_pile(E0, P, A, E1, 1).
 
-% Si plus rien à insérer dans la liste, alors on peut continuer comme avant.
-% Voir avec les priorités d'une nouvelle case...
-insere_pile([X|R0], [], A, [X|R1], A) :- insere_pile(R0, [], A, R1, A).
 
-% Si il reste des trucs dans la pile, on les insère
-% /!\ VERIFIER que l'ordre LIFO de la pile ne change pas...
-insere_pile(E0, [X|R], A, [X|R1], A) :- insere_pile(E0, R, A, R1, A).
 
-% Cas usuel
-insere_pile([X|R0], _, A, [X|R1], CC) :- insere_pile(R0, _, A, R1, CC).
-insere_pile([-1|R0], _, A, [-1|R1], CC) :- 	CC1 is CC+1,
-											insere_pile(R0, _, A, R1, CC1).
 
-% Si on arrive sur la case #10 (après la fin)
-% Alors les deux états (nouveau et ancien) sont vides, et la pile également
-insere_pile([], [], _, [], 10) :- !.
+% -----------------------------------------------
+% insere_pile(+[ETAT0], +[PILE], +ARRIVEE, ?[ETAT1]).
+% -----------------------------------------------
+
+% Compteur de cases
+insere_pile(E0, P, A, E1) :-
+			insere_pile(E0, P, A, E1, 1), !.
+
+% On insère la pile au dessus de la case #A si on est dessus
+insere_pile(E0, [X|R], A, [X|R1], A) :-
+			insere_pile(E0, R, A, R1, A), !.
+
+% On rencontre un -1, synonyme d'une nouvelle case
+insere_pile([-1|R0], P, A, [-1|R1], CC) :-
+			CC1 is CC+1,
+			insere_pile(R0, P, A, R1, CC1), !.
+
+% On peut continuer à recopier l'état initial, indépendamment de la pile
+insere_pile([X|R0], P, A, [X|R1], CC) :-
+			insere_pile(R0, P, A, R1, CC), !.
+
+% On s'arrête si on a fini de parcourir l'état initial (et la pile est vide)
+insere_pile([], [], _, [], _) :- !.
+% insere_pile([], [], _, [], 10) :- !.
+
 
 
 
