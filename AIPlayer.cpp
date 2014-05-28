@@ -152,7 +152,7 @@ void AIPlayer::play(QEventLoop* pause) {
     qDebug() << "\t\t\t\t\t\t\tSELECT PION";
 
     selectedPawn->setSelected(1);
-    selectedPawn->pawnSelected(); // on envoie un signal au pawnLabel correspondant
+    selectedPawn->selectCorrespondingLabel(); // on envoie un signal au pawnLabel correspondant
     // Il faut mettre à jour pawnlabel
 
     // Puis on le fait bouger là où il faut ################################

@@ -16,6 +16,7 @@ public:
     void setSelected(int select);
     bool getIsWhite();
     void selectCorrespondingLabel();
+    void sendSignal();
 
 signals:
     void deselectOthers(Pawn *p); // lorsqu'un pion est sélectionné, ce signal active un slot de board qui déselectionnera les autres
