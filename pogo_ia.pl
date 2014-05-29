@@ -81,7 +81,7 @@ eval_pion(0, -1).		% pion noir
 %						eval1(R, E1, C1).	% On évalue le reste
 
 % ------------ Fonctionnel ------------
-eval1(ETAT, E) :- eval1(ETAT, E, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+eval(ETAT, E) :- eval1(ETAT, E, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 
 eval1([], 0, 0) :- !.
 eval1([-1|R], E, _) :- 	eval1(R, E, 0), !.		% Si on trouve un -1, C <- 0
