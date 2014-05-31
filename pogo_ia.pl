@@ -291,5 +291,35 @@ coups_possibles_joueur1([P|R1],[I|R2],COUPS):-
 						coups_pile(P,I,C1),
 						append(C1,C2,COUPS),
 						coups_possibles_joueur1(R1,R2,C2).
-								
+					
+% coup_max(+ETAT,+COUPS,-COUP,-NETAT)
+% Cette fonction prend un état, une liste de coups, et ressort le coup COUP qui amène à l'état NETAT évalué le plus haut possible
+
+coup_max(_,[C],C,_).
+
+coup_max(ETAT,[[D,A,I]|R],[DM,AM,IM],MAXETAT):-
+					coup_max(ETAT,R,[DM1,AM1,IM1],MAXETAT1),
+					nouvel_etat(ETAT,D,A,I,NETAT),
+					eval(MAXETAT1,EV1),
+					eval(NETAT,EV),
+					(EV >= EV1,!, MAXETAT = NETAT, DM is D, AM is A, IM is I;
+					 EV < EV1,!, MAXETAT = MAXETAT1,DM is DM1, AM is AM1, IM is IM1).
+				
+						
+% meilleur_coup(+ETAT,+JOUEUR,-COUP,-NETAT)
+% La fonction meilleur_coup va ressortir COUP, le coup qui mènera vers le meilleur nouveau etat NETAT pour JOUEUR
+% Le joueur 1 va chercher à MAXIMISER l'évaluation de NETAT
+% Le joueur 0 va chercher à MINIMISER     ''       ''   ''
+
+meilleur_coup(E,1,C,NE):-
+				coups_possibles_joueur(E,1,CS),
+				meilleur_coup(E,1,CS,C,NE).
+				
+meilleur_coup(E,1,CS,C,NE):- coup_max(E,CS,C,NE).
+				
+% minmax(+ETAT,+JOUEUR,+DEPTH,-COUP)
+% minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
+% la profondeur de la recherche est caractérisée par DEPTH
+
+
 
