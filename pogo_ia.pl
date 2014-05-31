@@ -224,65 +224,72 @@ longueur_deplacement(X,Y,LONG):-colonne(X,CX),colonne(Y,CY),ligne(X,LX),ligne(Y,
 % case(ETAT,CONTENU,SUITEETAT)
 % donne le contenu de la prochaine case non vide, ainsi que la suite de l'état à analyser
 case([],[],[]).
-case([-1|R],[],R).
+case([-1|R],[],R):-!.
 case([X|LC],[X|R2],R1):-case(LC,R2,R1).
 
-% cases(+ETAT,-CASES,-INDEXES)
-% Renvoie 2 Lists : CASES, la liste du contenu de chaque cases du plateau
-% 					INDEXES, la liste des index de chaque case du plateau, correspondant aux cases dans CASES (dans le même ordre)
-cases(E,C,L):-cases(E,C,1,L),!.
-cases([],[],_,[]):-!.
-cases([-1],[],_,[]):-!.
-cases([-1|LC],C,COUNT,IS):-!,
-			COUNT < 10,
+% joueur_case(+CASE,?JOUEUR)
+% JOUEUR est le joueur à qui appartient la case CASE (1 ou 0)
+
+joueur_case([X|_],X).
+			
+% piles_joueur(+ETAT,+JOUEUR,-PILES,-INDEXES)
+% Renvoie directement les piles possible pour le joueur JOUEUR, ainsi que les indices (cases) de ces piles
+			
+piles_joueur(E,J,P,L):- piles_joueur(E,J,P,1,L),!.
+piles_joueur([],_,[],_,[]):-!.
+piles_joueur([-1],_,[],_,[]):-!.
+piles_joueur([-1|LC],J,P,COUNT,IS):-!,
+			COUNT<10,
 			COUNT1 is COUNT+1,
-			cases(LC,C,COUNT1,IS).
-cases(ETAT,[CASE|R],COUNT,[COUNT|R1]):-
+			piles_joueur(LC,J,P,COUNT1,IS).
+piles_joueur(ETAT,J,[PILE|R],COUNT,[COUNT|R1]):-
 			case(ETAT,CASE,S),
+			joueur_case(CASE,J),
+			!,
+			pile(CASE,PILE),
+			COUNT1 is COUNT+1,
+			piles_joueur(S,J,R,COUNT1,R1).
+piles_joueur(ETAT,J,PILES,COUNT,INDEXES):-
+			case(ETAT,CASE,S),
+			not(joueur_case(CASE,J)),
 			!,
 			COUNT1 is COUNT+1,
-			cases(S,R,COUNT1,R1).
+			piles_joueur(S,J,PILES,COUNT1,INDEXES).
 			
 % pile(+CASE,?INDEXPILE)
 % renvoie la liste des index du pion à la base de chaque pile possibles pour une case
 pile(C,[1,2,3]):-length(C,Y),Y >= 3,!.
 pile(C,[1,2]):-length(C,2),!.
 pile(C,[1]):-length(C,1),!.
+						
+% coups_pile(CASE,INDEX,COUPS)
+% donnes une liste de tous les coups possibles pour la pile donnée (qui correspond à la case d'index INDEX)
 
-% piles(+CASES,-PILES)
-% renvoie les 1, 2 ou 3 indexes des piles possibles pour chaque case
+coups_pile(P,I,CO):-findall(COUPS,coups_pile1(P,I,COUPS),CO).
 
-piles([],[]).
-piles([C|R1],[P|R2]):-pile(C,P),piles(R1,R2).
-
-% coups_case(CASE,INDEX,COUPS)
-% donnes une liste de tous les coups possibles pour la case donnée (de contenu CASE et de numéro INDEX)
-
-coups_case(CA,I,CO):-pile(CA,P),findall(COUPS,coups_case1(P,I,COUPS),CO).
-
-coups_case1(P,I,[DEP,ARR,IND]):-
+coups_pile1(P,I,[DEP,ARR,IND]):-
 						DEP is I,
 						member(IND,P),
 						member(ARR,[1,2,3,4,5,6,7,8,9]),
 						longueur_deplacement(DEP,ARR,IND).
 						
-coups_case1(P,I,[DEP,ARR,3]):-
+coups_pile1(P,I,[DEP,ARR,3]):-
 						DEP is I,
 						member(3,P),
 						member(ARR,[1,2,3,4,5,6,7,8,9]),
 						longueur_deplacement(DEP,ARR,1).
 						
+% coups_possibles_joueur(+ETAT,+JOUEUR,-COUPS)
+% Retourne la liste des coups possibles pour le joueur JOUEUR
 
-% coups_possibles(+ETAT,-LISTE_COUPS). Donne la liste des coups possibles.
-% un coup est sous le format suivant : [ case de destination, case d'arrivée, indice du pion ]
-
-coups_possibles(ETAT,COUPS):-
-						cases(ETAT,CASES,INDEXES),
-						coups_possibles1(CASES,INDEXES,COUPS).
-
-coups_possibles1([],[],[]).
-coups_possibles1([CA|R1],[I|R2],COUPS):-
-						coups_case(CA,I,C1),
+coups_possibles_joueur(ETAT,JOUEUR,COUPS):-
+						piles_joueur(ETAT,JOUEUR,PILES,INDEXES),
+						coups_possibles_joueur1(PILES,INDEXES,COUPS).
+						
+coups_possibles_joueur1([],[],[]).						
+coups_possibles_joueur1([P|R1],[I|R2],COUPS):-
+						coups_pile(P,I,C1),
 						append(C1,C2,COUPS),
-						coups_possibles1(R1,R2,C2).
+						coups_possibles_joueur1(R1,R2,C2).
+								
 
