@@ -278,27 +278,6 @@ coups_pile1(P,I,[DEP,ARR,3]):-
 						member(3,P),
 						member(ARR,[1,2,3,4,5,6,7,8,9]),
 						longueur_deplacement(DEP,ARR,1).
-			
-% etats_pile(+ETAT,+PILE,+INDEX,-ETATS)
-% retourne tous les états ETATS possibles amenés par le mouvement des piles PILE, à partir d'un état ETAT
-
-etats_pile(ETAT,PILE,INDEX,ETATS):-findall(ETS,etats_pile1(ETAT,PILE,INDEX,ETS),ETATS).
-
-etats_pile1(ETAT,P,I,NE):-
-						DEP is I,
-						member(IND,P),
-						member(ARR,[1,2,3,4,5,6,7,8,9]),
-						longueur_deplacement(DEP,ARR,IND),
-						nouvel_etat(ETAT,DEP,ARR,IND,NE).
-						
-etats_pile1(ETAT,P,I,NE):-
-						DEP is I,
-						member(3,P),
-						member(ARR,[1,2,3,4,5,6,7,8,9]),
-						longueur_deplacement(DEP,ARR,1),
-						nouvel_etat(ETAT,DEP,ARR,3,NE).
-
-
 						
 % coups_possibles_joueur(+ETAT,+JOUEUR,-COUPS)
 % Retourne la liste des coups possibles pour le joueur JOUEUR
@@ -312,20 +291,6 @@ coups_possibles_joueur1([P|R1],[I|R2],COUPS):-
 						coups_pile(P,I,C1),
 						append(C1,C2,COUPS),
 						coups_possibles_joueur1(R1,R2,C2).
-						
-% etats_possibles_joueur(+ETAT,+JOUEUR,-NETATS)
-% retourne tous les états possibles à partir d'un état (ces états sont
-% amenés grâce aux coups possibles du joueur
-
-etats_possibles_joueur(ETAT,JOUEUR,NETATS):-
-						piles_joueur(ETAT,JOUEUR,PILES,INDEXES),
-						etats_possibles_joueur1(ETAT,PILES,INDEXES,NETATS).
-
-etats_possibles_joueur1(_,[],[],[]).
-etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
-						etats_pile(ETAT,P,I,E1),
-						append(E1,E2,NETATS),
-						etats_possibles_joueur1(ETAT,R1,R2,E2).
 					
 % coup_max(+ETAT,+COUPS,-COUP,-NETAT)
 % Cette fonction prend un état, une liste de coups, et ressort le coup COUP qui amène à l'état NETAT évalué le plus haut possible
@@ -366,24 +331,116 @@ meilleur_coup(E,1,C,NE):-
 meilleur_coup(E,0,C,NE):-
 				coups_possibles_joueur(E,0,CS),
 				coup_min(E,CS,C,NE).
+
+% etats_pile(+ETAT,+PILE,+INDEX,-ETATS)
+% retourne tous les états ETATS possibles amenés par le mouvement des piles PILE, à partir d'un état ETAT
+
+etats_pile(ETAT,PILE,INDEX,ETATS):-findall(ETS,etats_pile1(ETAT,PILE,INDEX,ETS),ETATS).
+
+etats_pile1(ETAT,P,I,NE):-
+						DEP is I,
+						member(IND,P),
+						member(ARR,[1,2,3,4,5,6,7,8,9]),
+						longueur_deplacement(DEP,ARR,IND),
+						nouvel_etat(ETAT,DEP,ARR,IND,NE).
+						
+etats_pile1(ETAT,P,I,NE):-
+						DEP is I,
+						member(3,P),
+						member(ARR,[1,2,3,4,5,6,7,8,9]),
+						longueur_deplacement(DEP,ARR,1),
+						nouvel_etat(ETAT,DEP,ARR,3,NE).
+						
+% etats_possibles_joueur(+ETAT,+JOUEUR,-NETATS)
+% retourne tous les états possibles à partir d'un état (ces états sont
+% amenés grâce aux coups possibles du joueur
+
+etats_possibles_joueur(ETAT,JOUEUR,NETATS):-
+						piles_joueur(ETAT,JOUEUR,PILES,INDEXES),
+						etats_possibles_joueur1(ETAT,PILES,INDEXES,NETATS).
+
+etats_possibles_joueur1(_,[],[],[]).
+etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
+						etats_pile(ETAT,P,I,E1),
+						append(E1,E2,NETATS),
+						etats_possibles_joueur1(ETAT,R1,R2,E2).
 				
 % minmax(+ETAT,+JOUEUR,+DEPTH,-COUP)
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH
 
-% algo du minmax :
-% générer tous les états possibles jusqu'à la profondeur souhaitée
-%
-
-minmax(_,_,0,_):-!. % Profondeur de l'algo atteint
-
-minmax(ETAT,JOUEUR,COUP):-
+%minmax(ETAT,JOUEUR,DEPTH,BESTETAT,EVALETAT):-
 				% pour retrouver le coup, il trouve le coup qui permet de passer de ETAT à N ETAT
-				minxmax1(ETAT,JOUEUR,BESTETAT).
+				% minmax1(ETAT,JOUEUR,DEPTH,BESTETAT,EVALETAT).
 				
-% minmax(ETAT,JOUEUR,BESTETAT):-
-				% faire un minmax sur tous les etats possibles
-				% coups_possibles_joueur(ETAT,JOUEUR,[
+minmax1(ETAT,JOUEUR,DEPTH,BESTETAT,EVALETAT):-
+				DEPTH > 0,
+				ONEDEEPER is DEPTH-1,
+				etats_possibles_joueur(ETAT,JOUEUR,L), % On trouve la liste des etats accessibles au joueur
+				length(L,LENGTH),
+				LENGTH > 0,
+				!,
+				meilleur_etat(ONEDEEPER,JOUEUR,L,BESTETAT,EVALETAT), % On cherche récursivement le meilleur état
+				!.
+
+minmax1(ETAT,_,0,ETAT,EVALETAT):- % Profondeur de l'algo atteint
+				eval(ETAT,EVALETAT),!.
+				
+minmax1(ETAT,_,_,ETAT,EVALETAT):- % Si il n'y a plus de mouvement possible (un des joueurs est dans un état gagnant, l'autre ne peut plus rien faire)
+				eval(ETAT,EVALETAT).
+
+% meilleur_etat(+DEPTH,+JOUEUR,+NETATS,-BESTETAT,-EVALETAT)
+% détermine le meilleur etat dans une liste d'etats en appelant minmax
+% récursivement
+
+% Il n'y plus qu'un état dans la liste d'états possibles
+meilleur_etat(DEPTH,JOUEUR,[E],BESTETAT,EVALETAT):-
+				inverser_joueur(JOUEUR,J1),
+				minmax1(E,J1,DEPTH,_BESTETAT,EVALETAT),
+				BESTETAT = E.
+				 
+meilleur_etat(DEPTH,JOUEUR,[ET1|R],BESTETAT,EVALETAT):-
+				inverser_joueur(JOUEUR,J1),
+				minmax1(ET1,J1,DEPTH,_BESTETAT,EV1),
+				meilleur_etat(DEPTH,JOUEUR,R,ET2,EV2),
+				meilleur_choix(JOUEUR,ET1,EV1,ET2,EV2,BESTETAT,EVALETAT).
+				 
+% meilleur_choix(+JOUEUR,+ETAT1,+EVAL1,+ETAT2,+EVAL2,+BESTETAT,+EVALETAT)
+% retourne BESTETAT, le meilleur choix d'etat entre ETAT1 et ETAT2 pour JOUEUR
+
+meilleur_choix(1,ETAT1,EVAL1,ETAT2,EVAL2,BESTETAT,EVALETAT):-
+					(EVAL1 >= EVAL2,!, BESTETAT = ETAT1, EVALETAT = EVAL1;
+					 EVAL1 < EVAL2,!, BESTETAT = ETAT2, EVALETAT = EVAL2).
+					 
+meilleur_choix(0,ETAT1,EVAL1,ETAT2,EVAL2,BESTETAT,EVALETAT):-
+					(EVAL1 >= EVAL2,!, BESTETAT = ETAT2, EVALETAT = EVAL2;
+					 EVAL1 < EVAL2,!, BESTETAT = ETAT1, EVALETAT = EVAL1).
+
+% inverser_joueur(+J1,-J2).
+% transforme J1 = 1 en J2 = 0 et vice versa
+
+inverser_joueur(J1,J2):-
+			(J1 = 1,!,J2 = 0;
+			 J1 = 0,!,J2 = 1).
+					 
+% -descendre dans l'arborescence jusqu'à depth = 0
+% -à depth = 0, faire remonter le meilleur état pour JOUEUR
+
+% function minimax(node, depth, maximizingPlayer)
+    % if depth = 0 or node is a terminal node
+        % return the heuristic value of node
+    % if maximizingPlayer
+        % bestValue := -∞
+        % for each child of node
+            % val := minimax(child, depth - 1, FALSE)
+            % bestValue := max(bestValue, val);
+        % return bestValue
+    % else
+        % bestValue := +∞
+        % for each child of node
+            % val := minimax(child, depth - 1, TRUE)
+            % bestValue := min(bestValue, val);
+        % return bestValue
 
 
 			
