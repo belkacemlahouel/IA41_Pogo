@@ -262,7 +262,7 @@ pile(C,[1,2,3]):-length(C,Y),Y >= 3,!.
 pile(C,[1,2]):-length(C,2),!.
 pile(C,[1]):-length(C,1),!.
 						
-% coups_pile(CASE,INDEX,COUPS)
+% coups_pile(+PILE,+INDEX,COUPS)
 % donnes une liste de tous les coups possibles pour la pile donnée (qui correspond à la case d'index INDEX)
 
 coups_pile(P,I,CO):-findall(COUPS,coups_pile1(P,I,COUPS),CO).
@@ -278,6 +278,27 @@ coups_pile1(P,I,[DEP,ARR,3]):-
 						member(3,P),
 						member(ARR,[1,2,3,4,5,6,7,8,9]),
 						longueur_deplacement(DEP,ARR,1).
+			
+% etats_pile(+ETAT,+PILE,+INDEX,-ETATS)
+% retourne tous les états ETATS possibles amenés par le mouvement des piles PILE, à partir d'un état ETAT
+
+etats_pile(ETAT,PILE,INDEX,ETATS):-findall(ETS,etats_pile1(ETAT,PILE,INDEX,ETS),ETATS).
+
+etats_pile1(ETAT,P,I,NE):-
+						DEP is I,
+						member(IND,P),
+						member(ARR,[1,2,3,4,5,6,7,8,9]),
+						longueur_deplacement(DEP,ARR,IND),
+						nouvel_etat(ETAT,DEP,ARR,IND,NE).
+						
+etats_pile1(ETAT,P,I,NE):-
+						DEP is I,
+						member(3,P),
+						member(ARR,[1,2,3,4,5,6,7,8,9]),
+						longueur_deplacement(DEP,ARR,1),
+						nouvel_etat(ETAT,DEP,ARR,3,NE).
+
+
 						
 % coups_possibles_joueur(+ETAT,+JOUEUR,-COUPS)
 % Retourne la liste des coups possibles pour le joueur JOUEUR
@@ -291,6 +312,20 @@ coups_possibles_joueur1([P|R1],[I|R2],COUPS):-
 						coups_pile(P,I,C1),
 						append(C1,C2,COUPS),
 						coups_possibles_joueur1(R1,R2,C2).
+						
+% etats_possibles_joueur(+ETAT,+JOUEUR,-NETATS)
+% retourne tous les états possibles à partir d'un état (ces états sont
+% amenés grâce aux coups possibles du joueur
+
+etats_possibles_joueur(ETAT,JOUEUR,NETATS):-
+						piles_joueur(ETAT,JOUEUR,PILES,INDEXES),
+						etats_possibles_joueur1(ETAT,PILES,INDEXES,NETATS).
+
+etats_possibles_joueur1(_,[],[],[]).
+etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
+						etats_pile(ETAT,P,I,E1),
+						append(E1,E2,NETATS),
+						etats_possibles_joueur1(ETAT,R1,R2,E2).
 					
 % coup_max(+ETAT,+COUPS,-COUP,-NETAT)
 % Cette fonction prend un état, une liste de coups, et ressort le coup COUP qui amène à l'état NETAT évalué le plus haut possible
@@ -335,6 +370,23 @@ meilleur_coup(E,0,C,NE):-
 % minmax(+ETAT,+JOUEUR,+DEPTH,-COUP)
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH
+
+% algo du minmax :
+% générer tous les états possibles jusqu'à la profondeur souhaitée
+%
+
+minmax(_,_,0,_):-!. % Profondeur de l'algo atteint
+
+minmax(ETAT,JOUEUR,COUP):-
+				% pour retrouver le coup, il trouve le coup qui permet de passer de ETAT à N ETAT
+				minxmax1(ETAT,JOUEUR,BESTETAT).
+				
+% minmax(ETAT,JOUEUR,BESTETAT):-
+				% faire un minmax sur tous les etats possibles
+				% coups_possibles_joueur(ETAT,JOUEUR,[
+
+
+			
 
 
 
