@@ -329,7 +329,7 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH
 
-minmax(ETAT,JOUEUR,DEPTH,BESTCOUP):-
+minmax1(ETAT,JOUEUR,DEPTH,BESTCOUP):-
 				alphabeta(ETAT,JOUEUR,-10000,10000,BESTCOUP,_EVALETAT,DEPTH). % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
 
 % alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
@@ -382,6 +382,49 @@ betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur qu
   JOUEUR = 1, Val1 < Val2, !.
 
 betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
+
+% /!\ AUTRE VERSION DU ALPHA-BETA, MOINS DE CALCULS, PLUS RAPIDE /!\
+%
+% minmax(+ETAT,+JOUEUR,+DEPTH,-COUP)
+% minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
+% la profondeur de la recherche est caractérisée par DEPTH
+
+minmax2(ETAT,JOUEUR,DEPTH,BESTCOUP):-
+				alpha_beta(JOUEUR,DEPTH,ETAT,-10000,10000,BESTCOUP,_EVALETAT),!. % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
+
+alpha_beta(Player,D,Etat,Alpha,Beta,Move,Value) :- 
+   D > 0, 
+   D1 is D-1, 
+   coups_possibles_joueur(Etat,Player,L),
+   length(L,LENGTH),
+   LENGTH > 0,
+   Alpha1 is -Beta, % max/min
+   Beta1 is -Alpha,
+   evaluate_and_choose(Player,L,Etat,D1,Alpha1,Beta1,nil,(Move,Value)).
+   
+alpha_beta(_Player,0,Etat,_Alpha,_Beta,_NoMove,Value) :- 
+   eval(Etat,Value),!.
+   
+alpha_beta(_,_,Etat,_,_,_,Value) :- 
+   eval(Etat,Value).
+
+evaluate_and_choose(Player,[[D,A,I]|Moves],Etat,Depth,Alpha,Beta,Record,BestMove) :-
+	nouvel_etat(Etat,D,A,I,NE),
+   inverser_joueur(Player,OtherPlayer),
+   alpha_beta(OtherPlayer,Depth,NE,Alpha,Beta,_OtherMove,Value),
+   Value1 is -Value,
+   cutoff(Player,[D,A,I],Value1,Depth,Alpha,Beta,Moves,Etat,Record,BestMove).
+   
+evaluate_and_choose(_Player,[],_Etat,_D,Alpha,_Beta,Move,(Move,Alpha)). % On a visité tous les moves
+
+cutoff(_Player,Move,Value,_D,_Alpha,Beta,_Moves,_Etat,_Record,(Move,Value)) :- 
+   Value >= Beta, !.
+cutoff(Player,Move,Value,D,Alpha,Beta,Moves,Etat,_Record,BestMove) :- 
+   Alpha < Value, Value < Beta, !, 
+   evaluate_and_choose(Player,Moves,Etat,D,Value,Beta,Move,BestMove).
+cutoff(Player,_Move,Value,D,Alpha,Beta,Moves,Etat,Record,BestMove) :- 
+   Value =< Alpha, !, 
+   evaluate_and_choose(Player,Moves,Etat,D,Alpha,Beta,Record,BestMove).
 
 % inverser_joueur(+J1,-J2).
 % transforme J1 = 1 en J2 = 0 et vice versa
