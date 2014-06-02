@@ -330,52 +330,58 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 % la profondeur de la recherche est caractérisée par DEPTH
 
 minmax(ETAT,JOUEUR,DEPTH,BESTCOUP):-
-				minmax1(ETAT,JOUEUR,DEPTH,BESTCOUP,_EVALETAT).
+				alphabeta(ETAT,JOUEUR,-10000,10000,BESTCOUP,_EVALETAT,DEPTH). % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
+
+% alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
+%
 				
-minmax1(ETAT,JOUEUR,DEPTH,BESTCOUP,EVALETAT):-
-				DEPTH > 0,
-				ONEDEEPER is DEPTH-1,
-				coups_possibles_joueur(ETAT,JOUEUR,L), % On trouve la liste des etats accessibles au joueur
-				length(L,LENGTH),
-				LENGTH > 0,
-				!,
-				meilleur_etat(ONEDEEPER,ETAT,JOUEUR,L,BESTCOUP,EVALETAT), % On cherche récursivement le meilleur état
-				!.
+alphabeta(ETAT, JOUEUR, Alpha, Beta, BESTCOUP, BESTEVAL, Depth) :-
+	Depth > 0,
+	OneDeeper is Depth - 1,
+	coups_possibles_joueur(ETAT, JOUEUR, L),
+	length(L,LMOVES),
+	LMOVES > 0,
+	!,
+	boundedbest(ETAT,L, Alpha, Beta, JOUEUR, OneDeeper, BESTCOUP, BESTEVAL).
+  
+alphabeta(ETAT, _, _, _, _, Val, 0) :-
+		eval(ETAT,Val),!.
+		
+alphabeta(ETAT, _, _, _, _, Val, _) :- % Si plus de coup avant d'avoir atteint la profondeur 0
+		eval(ETAT,Val).
 
-minmax1(ETAT,_,0,_,EVALETAT):- % Profondeur de l'algo atteint
-				eval(ETAT,EVALETAT),!.
-				
-minmax1(ETAT,_,_,_,EVALETAT):- % Si il n'y a plus de mouvement possible (un des joueurs est dans un état gagnant, l'autre ne peut plus rien faire)
-				eval(ETAT,EVALETAT).
+boundedbest(ETAT,[[D,A,I]|NEXTCOUPS], Alpha, Beta, JOUEUR, Depth, BESTCOUP, BESTVAL) :-
+  inverser_joueur(JOUEUR, J2),
+  nouvel_etat(ETAT,D,A,I,NEXTETAT),
+  alphabeta(NEXTETAT, J2, Alpha, Beta, _BESTCOUP, Val, Depth),
+  goodenough(ETAT,NEXTCOUPS,Depth, Alpha, Beta, JOUEUR, [D,A,I], Val, BESTCOUP, BESTVAL).
 
-% meilleur_etat(+DEPTH,+JOUEUR,+NETATS,-BESTETAT,-EVALETAT)
-% détermine le meilleur etat dans une liste d'etats en appelant minmax
-% récursivement
+goodenough(_,[],_, _, _, _, COUP, Val, COUP, Val) :-!.   % On a fini la liste de coups
 
-% Il n'y plus qu'un état dans la liste d'états possibles
-meilleur_etat(DEPTH,ETAT,JOUEUR,[[D,A,I]],COUP,EVALETAT):-
-				nouvel_etat(ETAT,D,A,I,NE),
-				inverser_joueur(JOUEUR,J1),
-				minmax1(NE,J1,DEPTH,_COUP,EVALETAT),
-				COUP = [D,A,I].
-				 
-meilleur_etat(DEPTH,ETAT,JOUEUR,[[D,A,I]|R],COUP,EVALETAT):-
-				nouvel_etat(ETAT,D,A,I,ET1),
-				inverser_joueur(JOUEUR,J1),
-				minmax1(ET1,J1,DEPTH,_COUP,EV1),
-				meilleur_etat(DEPTH,ETAT,JOUEUR,R,C2,EV2),
-				meilleur_choix(JOUEUR,[D,A,I],EV1,C2,EV2,COUP,EVALETAT).
-				 
-% meilleur_choix(+JOUEUR,+COUP1,+EVAL1,+COUP2,+EVAL2,+BESTCOUP,+EVALETAT)
-% retourne BESTCOUP, le coup qui est évalué le meilleur entre COUP1 et COUP2
+goodenough(_,_,_, Alpha, Beta, JOUEUR, COUP, Val, COUP, Val) :-
+  JOUEUR = 0, Val > Beta, !                 % MIN a dépassé la beta
+  ;
+  JOUEUR = 1, Val < Alpha, !.               % MAX est passé sous alpha
 
-meilleur_choix(1,COUP1,EVAL1,COUP2,EVAL2,BESTCOUP,EVALETAT):-
-					(EVAL1 >= EVAL2,!, BESTCOUP = COUP1, EVALETAT = EVAL1;
-					 EVAL1 < EVAL2,!, BESTCOUP = COUP2, EVALETAT = EVAL2).
-					 
-meilleur_choix(0,COUP1,EVAL1,COUP2,EVAL2,BESTCOUP,EVALETAT):-
-					(EVAL1 >= EVAL2,!, BESTCOUP = COUP2, EVALETAT = EVAL2;
-					 EVAL1 < EVAL2,!, BESTCOUP = COUP1, EVALETAT = EVAL1).
+goodenough(ETAT,MOVELIST,Depth, Alpha, Beta, JOUEUR, COUP, Val, BESTCOUP, BESTEVAL)  :-
+  newbounds(Alpha, Beta, JOUEUR, Val, NewAlpha, NewBeta),
+  boundedbest(ETAT,MOVELIST, NewAlpha, NewBeta, JOUEUR, Depth, COUP1, Val1),
+  betterof(JOUEUR, COUP, Val, COUP1, Val1, BESTCOUP, BESTEVAL).
+
+newbounds(Alpha, Beta, JOUEUR, Val, Val, Beta)  :-
+  JOUEUR = 0, Val > Alpha, !.               % Pour MAX, Lower bond augmente
+
+newbounds(Alpha, Beta, JOUEUR, Val, Alpha, Val)  :-
+  JOUEUR = 1, Val < Beta, !.                % Pour MIN, upper bond diminue
+
+newbounds(Alpha, Beta, _, _, Alpha, Beta).           % Rien ne change
+
+betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur que COUP2
+  JOUEUR = 0, Val1 > Val2, !
+  ;
+  JOUEUR = 1, Val1 < Val2, !.
+
+betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
 
 % inverser_joueur(+J1,-J2).
 % transforme J1 = 1 en J2 = 0 et vice versa
