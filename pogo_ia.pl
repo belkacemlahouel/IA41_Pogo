@@ -2,7 +2,9 @@
 % think([ETAT], [cJoueur, lvlAI], [nCaseDepart, nCaseArrivee, indexPionStack]).
 % #############################################################################
 
-% -----------------------------------------------------------------------------
+think(ETAT,[JOUEUR,_LVL],COUP):-
+			minmax1(ETAT,JOUEUR,3,COUP).
+% ------------------------------------qsdq----qsdqsd-------------------------------------
 % ETAT est codé comme suit :
 %		-1 pour dire qu'on passe à la case suivante
 %		1  pour désigner un pion blanc
@@ -383,53 +385,72 @@ betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur qu
 
 betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
 
-% /!\ AUTRE VERSION DU ALPHA-BETA, MOINS DE CALCULS, PLUS RAPIDE /!\
+% /!\ AUTRE VERSION DU ALPHA-BETA, MOINS DE CALCULS, PLUS RAPIDE (negamax) /!\
 %
-% minmax(+ETAT,+JOUEUR,+DEPTH,-COUP)
-% minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
+% negamax(+ETAT,+JOUEUR,+DEPTH,-COUP)
+% negamax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH
 
-minmax2(ETAT,JOUEUR,DEPTH,BESTCOUP):-
+negamax(ETAT,JOUEUR,DEPTH,BESTCOUP):-
 				alpha_beta(JOUEUR,DEPTH,ETAT,-10000,10000,BESTCOUP,_EVALETAT),!. % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
 
-alpha_beta(Player,D,Etat,Alpha,Beta,Move,Value) :- 
+% alpha_beta
+% La fonction alpha_beta va récursivement descendre dans l'arbre jusqu'à la profondeur DEPTH, ou jusqu'à
+% ce qu'il n'y ait plus de mouvements possibles.
+% NOTE : contrairement à un Alpha/Beta classique, On inverse constamment Alpha et Beta.
+% Dans un alpha-beta normal, on fait évoluer tour à tour les bornes alpha (meilleur choix pour min) puis bêta (meilleur choix pour max)
+% Dans cet alpha-beta, on les inverse à chaque tour, ce qui fait qu'on n'a pas besoin d'alterner entre maximisation/minimisation
+				
+alpha_beta(JOUEUR,D,ETAT,Alpha,Beta,BESTCOUP,Value) :- 
    D > 0, 
    D1 is D-1, 
-   coups_possibles_joueur(Etat,Player,L),
+   coups_possibles_joueur(ETAT,JOUEUR,L),
    length(L,LENGTH),
    LENGTH > 0,
    Alpha1 is -Beta, % max/min
    Beta1 is -Alpha,
-   evaluate_and_choose(Player,L,Etat,D1,Alpha1,Beta1,nil,(Move,Value)).
+   evaluate_and_choose(JOUEUR,L,ETAT,D1,Alpha1,Beta1,nil,(BESTCOUP,Value)).
    
-alpha_beta(_Player,0,Etat,_Alpha,_Beta,_NoMove,Value) :- 
-   eval(Etat,Value),!.
+alpha_beta(_JOUEUR,0,ETAT,_Alpha,_Beta,_NoMove,Value) :- % profondeur atteinte, on évalue la feuille
+   eval(ETAT,Value),!.
    
-alpha_beta(_,_,Etat,_,_,_,Value) :- 
-   eval(Etat,Value).
+alpha_beta(_,_,ETAT,_,_,_,Value) :- % plus de coups possible, on évalue la feuille
+   eval(ETAT,Value).
 
-evaluate_and_choose(Player,[[D,A,I]|Moves],Etat,Depth,Alpha,Beta,Record,BestMove) :-
-	nouvel_etat(Etat,D,A,I,NE),
-   inverser_joueur(Player,OtherPlayer),
-   alpha_beta(OtherPlayer,Depth,NE,Alpha,Beta,_OtherMove,Value),
-   Value1 is -Value,
-   cutoff(Player,[D,A,I],Value1,Depth,Alpha,Beta,Moves,Etat,Record,BestMove).
+evaluate_and_choose(JOUEUR,[[D,A,I]|Moves],ETAT,Depth,Alpha,Beta,Record,BestMove) :-
+	nouvel_etat(ETAT,D,A,I,NE),
+   inverser_joueur(JOUEUR,J1),
+   alpha_beta(J1,Depth,NE,Alpha,Beta,_OtherMove,EVAL),
+   EVAL1 is -EVAL,
+   cutoff(JOUEUR,[D,A,I],EVAL1,Depth,Alpha,Beta,Moves,ETAT,Record,BestMove).
    
-evaluate_and_choose(_Player,[],_Etat,_D,Alpha,_Beta,Move,(Move,Alpha)). % On a visité tous les moves
+evaluate_and_choose(_JOUEUR,[],_ETAT,_D,Alpha,_Beta,BESTCOUP,(BESTCOUP,Alpha)). % On a visité tous les moves
 
-cutoff(_Player,Move,Value,_D,_Alpha,Beta,_Moves,_Etat,_Record,(Move,Value)) :- 
+% cutoff(+JOUEUR,+COUP,+EVAL,+DEPTH,+ALPHA,+BETA,+COUPS,+ETAT,+RECORD,?BESTMOVE)
+% La fonction cutoff va regarder comparer la valeur de Alpha et Beta, et décider si
+% la recherche doit continuer ou si on doit couper la branche.
+%		
+%	
+%
+%		Trois cas se distinguent :
+%
+%		1 La nouvelle valeur trouvée dépasse la borne max : on coupe la branche
+%		2 La nouvelle valeur est bien comprise entre les anciens Alpha et Beta : on change la borne min (alpha).
+%		3 La nouvelle valeur est inférieure à l'ancienne borne min (alpha), on ne change pas la valeur de cette dernière
+%
+%		Dans les cas 2 et 3, on continue dans l'arborescence 
+
+cutoff(_JOUEUR,Move,Value,_D,_Alpha,Beta,_Moves,_Etat,_Record,(Move,Value)) :- 
    Value >= Beta, !.
-cutoff(Player,Move,Value,D,Alpha,Beta,Moves,Etat,_Record,BestMove) :- 
+cutoff(JOUEUR,Move,Value,D,Alpha,Beta,Moves,Etat,_Record,BestMove) :- 
    Alpha < Value, Value < Beta, !, 
-   evaluate_and_choose(Player,Moves,Etat,D,Value,Beta,Move,BestMove).
-cutoff(Player,_Move,Value,D,Alpha,Beta,Moves,Etat,Record,BestMove) :- 
+   evaluate_and_choose(JOUEUR,Moves,Etat,D,Value,Beta,Move,BestMove).
+cutoff(JOUEUR,_Move,Value,D,Alpha,Beta,Moves,Etat,Record,BestMove) :- 
    Value =< Alpha, !, 
-   evaluate_and_choose(Player,Moves,Etat,D,Alpha,Beta,Record,BestMove).
+   evaluate_and_choose(JOUEUR,Moves,Etat,D,Alpha,Beta,Record,BestMove).
 
 % inverser_joueur(+J1,-J2).
 % transforme J1 = 1 en J2 = 0 et vice versa
 
-inverser_joueur(J1,J2):-
-			(J1 = 1,!,J2 = 0;
-			 J1 = 0,!,J2 = 1).
-			 
+inverser_joueur(1,0).
+inverser_joueur(0,1).			 

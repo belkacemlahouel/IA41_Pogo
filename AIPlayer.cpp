@@ -7,7 +7,7 @@
 // -------------------------------------------------------------------------
 AIPlayer::AIPlayer(bool isW, int lvl, Board* b) {
     qDebug() << "\t\t\t\t\t\tINSTANCIATION AI\n";
-    m_PrologInterface.init("prgp.exe");
+    m_PrologInterface.init("pogo.exe");
     isWhite = isW;
     level = max(0, min(3, lvl)); // 0 <= level <= 3
     board = b;
@@ -22,40 +22,47 @@ AIPlayer::AIPlayer(bool isW, int lvl, Board* b) {
 // -------------------------------------------------------------------------
 void AIPlayer::think() {
     if (m_PrologInterface.start("think", 3)) {
+
         // Board creation in Prolog format
-        int etat[21], n = 0;
+        int32* etat = new int32[21];
+        int n = 0;
+
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
-                Case* ca = &(board->board[i][j]);
-                list<Pawn*>* pawns = &(ca->pawnList);
-                list<Pawn*>::iterator it;
+                Case* ca = &(board->board[j][i]);
+                list<Pawn*>& pawns = ca->pawnList;
+                list<Pawn*>::reverse_iterator it;
 
                 // Ordre stack : top = premier
-                for (it = pawns->end(); it != pawns->begin(); --it) {
+                int length = pawns.size();
+                for (it = pawns.rbegin(); it != pawns.rend(); ++it) {
                     Pawn* tmp = *it;
-                    if (tmp->getIsWhite())       etat[n] = 0; // White pawn
-                    else                         etat[n] = 1; // Black pawn
+                    if (tmp->getIsWhite())       etat[n] = 1; // White pawn
+                    else                         etat[n] = 0; // Black pawn
+                    ++ n;
                 }
-                etat[n] = -1;                                 // Next case
-                ++ n;
+                // Next case
+                etat[n] = -1;
+                ++n;
             }
         }
         // On suppose qu'on a l'état comme il faut dans un format C++
 
         // On crée l'état au format Prolog
         term_t hEtat = (m_PrologInterface.funcNewTermRef)();
-
+        m_PrologInterface.cleanList(m_PrologInterface.FirstTerm);
         // On met la liste au format C++ dans un format Prolog
         m_PrologInterface.putList(hEtat, 21, etat);
+
+        /* LE BUG PROVIENT D'ENTRE ICI <<<<<<<<<<<<<<<<<<< */
 
         // On construit la liste
         // et on dit que c'est le premier terme du predicat Prolog
         m_PrologInterface.consList(m_PrologInterface.FirstTerm, hEtat);
 
-
         // On pourrait se débrouiller pour mettre ça dans l'état
         // Contient des infos player : couleur, niveau
-        int cPlayer[2];
+        int32* cPlayer = new int32[2];
 
         // Récupération des infos du joueur : couleur
         if (isWhite) cPlayer[0] = 1;
@@ -65,14 +72,17 @@ void AIPlayer::think() {
 
         term_t hCPlayer = (m_PrologInterface.funcNewTermRef)();
         m_PrologInterface.putList(hCPlayer, 2, cPlayer);
+
         term_t ptrTerm = m_PrologInterface.FirstTerm+1;
+        m_PrologInterface.cleanList(ptrTerm);
         m_PrologInterface.consList(ptrTerm, hCPlayer);
 
+        /* ET ICI >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
         term_t hReponse = m_PrologInterface.FirstTerm+2;
 
         if (m_PrologInterface.call()) {
-            std::vector<int> reponse;
+            std::vector<int32> reponse;
             m_PrologInterface.getList(hReponse, reponse);
 
             // Enregistrement des infos dans les attributs du joueur
@@ -103,21 +113,23 @@ void AIPlayer::play(QEventLoop* pause) {
         /* ********************* */
         // Supposons le prédicat Prolog appelé et les résultats obtenus
         // On suppose que le coup est possible
-        nCaseDepart = 1;
-        nCaseArrivee = 2;
-        indexPionStack = 1;
+        //nCaseDepart = 1;
+        //nCaseArrivee = 2;
+        //indexPionStack = 1;
         /* ********************* */
+
+    this->think();
 
     // On récupère le pion et on le sélectionne ############################
     Pawn* selectedPawn;
     list<Pawn*>::iterator it;
     int k = 1;
     int iD, jD;
-    int iA, jA; // Coordonnées des cases de Départ/Arrivée, à la mode c++
+    int iA, jA; // Coordonnées des cases de Départ/Arrivée, �  la mode c++
 
     qDebug() << "\t\t\t\t\t\t\tCALCULS COORD";
 
-    // Attention2 : Les index des cases commencent à 1
+    // Attention2 : Les index des cases commencent �  1
     // Calcul des coordonnées iD, jD
     jD = (nCaseDepart-1)/3;
     iD = (nCaseDepart-1)%3;
@@ -153,9 +165,9 @@ void AIPlayer::play(QEventLoop* pause) {
 
     selectedPawn->setSelected(1);
     selectedPawn->selectCorrespondingLabel(); // on envoie un signal au pawnLabel correspondant
-    // Il faut mettre à jour pawnlabel
+    // Il faut mettre �  jour pawnlabel
 
-    // Puis on le fait bouger là où il faut ################################
+    // Puis on le fait bouger l�  où il faut ################################
     // On lui indique le pointeur sur la nouvelle case
     qDebug() << "\t\t\t\t\t\t\tMOVE PION";
 
