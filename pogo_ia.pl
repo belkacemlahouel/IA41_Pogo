@@ -1,9 +1,3 @@
-% #############################################################################
-% think([ETAT], [cJoueur, lvlAI], [nCaseDepart, nCaseArrivee, indexPionStack]).
-% #############################################################################
-
-think(ETAT,[JOUEUR,_LVL],COUP):-
-			minmax1(ETAT,JOUEUR,3,COUP).
 % ------------------------------------qsdq----qsdqsd-------------------------------------
 % ETAT est codé comme suit :
 %		-1 pour dire qu'on passe à la case suivante
@@ -42,19 +36,33 @@ think(ETAT,[JOUEUR,_LVL],COUP):-
 % 7 8 9
 % -----------------------------------------------------------------------------
 
+% Pour sauvegarder l'état du jeu
+:- dynamic actualState/1.
 
+% actualState(-ETAT)
+% conserve l'état actuel du plateau. Ce prédicat est dynamique, on y insère sans arrêt le nouveau état, et on supprime l'ancien
+% il ne contient donc pas de clause à proprement parler
 
+% initial_state(-ETAT)
+% renvoie l'état initial d'une partie
 
+initial_state(ETAT):-
+		ETAT = [1,1,-1,1,1,-1,1,1,-1,-1,-1,-1,0,0,-1,0,0,-1,0,0,-1].
 
-
-
-
-
-
-
-
-
-
+% set_initial_state/0
+% ce prédicat enregistre l'état initial en tant qu'état actuel. Nécessaire pour le tout début du jeu.
+		
+set_initial_state:-
+    retractall(actualState(_)),
+    initial_state(E),
+    assert(actualState(E)).
+		
+% saveState(+COUP)
+% Sauvegarde le coup joué
+saveState([D,A,I]) :-
+    retract(actualState(E)),
+    nouvel_etat(E,D,A,I,E1),
+    assert(actualState(E1)).
 
 
 % #############################################################################
@@ -229,6 +237,23 @@ case([],[],[]).
 case([-1|R],[],R):-!.
 case([X|LC],[X|R2],R1):-case(LC,R2,R1).
 
+% cases(+ETAT,-CASES,-INDEXES)
+% Renvoie 2 Lists : CASES, la liste du contenu de chaque cases du plateau
+% INDEXES, la liste des index de chaque case du plateau, correspondant aux cases dans CASES (dans le même ordre)
+	
+cases(E,C,L):-cases(E,C,1,L),!.
+cases([],[],_,[]):-!.
+cases([-1],[],_,[]):-!.
+cases([-1|LC],C,COUNT,IS):-!,
+COUNT < 10,
+COUNT1 is COUNT+1,
+cases(LC,C,COUNT1,IS).
+cases(ETAT,[CASE|R],COUNT,[COUNT|R1]):-
+case(ETAT,CASE,S),
+		!,
+		COUNT1 is COUNT+1,
+		cases(S,R,COUNT1,R1).
+
 % joueur_case(+CASE,?JOUEUR)
 % JOUEUR est le joueur à qui appartient la case CASE (1 ou 0)
 
@@ -331,7 +356,7 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH
 
-minmax1(ETAT,JOUEUR,DEPTH,BESTCOUP):-
+minmax(ETAT,JOUEUR,DEPTH,BESTCOUP):-
 				alphabeta(ETAT,JOUEUR,-10000,10000,BESTCOUP,_EVALETAT,DEPTH). % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
 
 % alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
@@ -385,72 +410,138 @@ betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur qu
 
 betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
 
-% /!\ AUTRE VERSION DU ALPHA-BETA, MOINS DE CALCULS, PLUS RAPIDE (negamax) /!\
-%
-% negamax(+ETAT,+JOUEUR,+DEPTH,-COUP)
-% negamax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
-% la profondeur de la recherche est caractérisée par DEPTH
-
-negamax(ETAT,JOUEUR,DEPTH,BESTCOUP):-
-				alpha_beta(JOUEUR,DEPTH,ETAT,-10000,10000,BESTCOUP,_EVALETAT),!. % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
-
-% alpha_beta
-% La fonction alpha_beta va récursivement descendre dans l'arbre jusqu'à la profondeur DEPTH, ou jusqu'à
-% ce qu'il n'y ait plus de mouvements possibles.
-% NOTE : contrairement à un Alpha/Beta classique, On inverse constamment Alpha et Beta.
-% Dans un alpha-beta normal, on fait évoluer tour à tour les bornes alpha (meilleur choix pour min) puis bêta (meilleur choix pour max)
-% Dans cet alpha-beta, on les inverse à chaque tour, ce qui fait qu'on n'a pas besoin d'alterner entre maximisation/minimisation
-				
-alpha_beta(JOUEUR,D,ETAT,Alpha,Beta,BESTCOUP,Value) :- 
-   D > 0, 
-   D1 is D-1, 
-   coups_possibles_joueur(ETAT,JOUEUR,L),
-   length(L,LENGTH),
-   LENGTH > 0,
-   Alpha1 is -Beta, % max/min
-   Beta1 is -Alpha,
-   evaluate_and_choose(JOUEUR,L,ETAT,D1,Alpha1,Beta1,nil,(BESTCOUP,Value)).
-   
-alpha_beta(_JOUEUR,0,ETAT,_Alpha,_Beta,_NoMove,Value) :- % profondeur atteinte, on évalue la feuille
-   eval(ETAT,Value),!.
-   
-alpha_beta(_,_,ETAT,_,_,_,Value) :- % plus de coups possible, on évalue la feuille
-   eval(ETAT,Value).
-
-evaluate_and_choose(JOUEUR,[[D,A,I]|Moves],ETAT,Depth,Alpha,Beta,Record,BestMove) :-
-	nouvel_etat(ETAT,D,A,I,NE),
-   inverser_joueur(JOUEUR,J1),
-   alpha_beta(J1,Depth,NE,Alpha,Beta,_OtherMove,EVAL),
-   EVAL1 is -EVAL,
-   cutoff(JOUEUR,[D,A,I],EVAL1,Depth,Alpha,Beta,Moves,ETAT,Record,BestMove).
-   
-evaluate_and_choose(_JOUEUR,[],_ETAT,_D,Alpha,_Beta,BESTCOUP,(BESTCOUP,Alpha)). % On a visité tous les moves
-
-% cutoff(+JOUEUR,+COUP,+EVAL,+DEPTH,+ALPHA,+BETA,+COUPS,+ETAT,+RECORD,?BESTMOVE)
-% La fonction cutoff va regarder comparer la valeur de Alpha et Beta, et décider si
-% la recherche doit continuer ou si on doit couper la branche.
-%		
-%	
-%
-%		Trois cas se distinguent :
-%
-%		1 La nouvelle valeur trouvée dépasse la borne max : on coupe la branche
-%		2 La nouvelle valeur est bien comprise entre les anciens Alpha et Beta : on change la borne min (alpha).
-%		3 La nouvelle valeur est inférieure à l'ancienne borne min (alpha), on ne change pas la valeur de cette dernière
-%
-%		Dans les cas 2 et 3, on continue dans l'arborescence 
-
-cutoff(_JOUEUR,Move,Value,_D,_Alpha,Beta,_Moves,_Etat,_Record,(Move,Value)) :- 
-   Value >= Beta, !.
-cutoff(JOUEUR,Move,Value,D,Alpha,Beta,Moves,Etat,_Record,BestMove) :- 
-   Alpha < Value, Value < Beta, !, 
-   evaluate_and_choose(JOUEUR,Moves,Etat,D,Value,Beta,Move,BestMove).
-cutoff(JOUEUR,_Move,Value,D,Alpha,Beta,Moves,Etat,Record,BestMove) :- 
-   Value =< Alpha, !, 
-   evaluate_and_choose(JOUEUR,Moves,Etat,D,Alpha,Beta,Record,BestMove).
-
 % inverser_joueur(+J1,-J2).
 % transforme J1 = 1 en J2 = 0 et vice versa
 
 inverser_joueur(1,0).
-inverser_joueur(0,1).			 
+inverser_joueur(0,1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+%
+%		PARTIE INTERFACE GRAPHIQUE
+%
+%
+%
+	
+% play/0
+% fonction sans paramètres qui est appellée au départ. Démarre tout simplement le jeu.
+% AJOUTER UNE FONCTION PLAY et PLAY_IA pour demander au joueur et à l'IA le coup qu'ils veulent jouer.
+
+play :-
+	write('Niveau (IA) :\n'),
+	write('\t0.\tCROIX (noirs)\n'),
+	write('\t1.\tRONDS (blancs)\n'),
+	ask_id(JOUEUR),
+	initial_state(E),
+	play(E, JOUEUR).
+	
+ask_player(ID) :-
+	read(ID),
+	integer(ID),
+	between(0, 1, ID), !.
+	
+ask_player(ID) :-
+	writeln('Choix invalide. Options : 0 ou 1\n'),
+	ask_id(ID).
+
+% printBoard(+ETAT)
+% La fonction printBoard prend en paramètre un état, et en ressort une représentation console de ce dernier
+
+printBoard(ETAT):- % BUG QUAND LA DERNIERE CASE DES VIDE !?
+			cases(ETAT,CASES,INDEXES),
+			writeline(48),
+			printBoard1(CASES,INDEXES,1).
+			
+printBoard1([],[],10):-
+		write('\n'),
+		writeline(48),!.
+		
+printBoard1([],[],_):- % si la dernière case est vide
+		print_case_and_blanks([]),
+		write('\n'),
+		writeline(48),!.
+		
+printBoard1(CASELIST,[INDEX|R2],NUM):-
+		INDEX \= NUM,
+		member(NUM,[1,4,7]),
+		write('\n'),
+		print_case_and_blanks([]),
+		NUM1 is NUM+1,
+		printBoard1(CASELIST,[INDEX|R2],NUM1),!.
+		
+printBoard1([CASE|R1],[INDEX|R2],NUM):-
+		NUM = INDEX,
+		member(NUM,[1,4,7]),
+		write('\n'),
+		print_case_and_blanks(CASE),
+		NUM1 is NUM+1,
+		printBoard1(R1,R2,NUM1),!.
+		
+printBoard1(CASELIST,[INDEX|R2],NUM):-
+		INDEX \= NUM,
+		print_case_and_blanks([]),
+		NUM1 is NUM+1,
+		printBoard1(CASELIST,[INDEX|R2],NUM1),!.
+		
+printBoard1([CASE|R1],[INDEX|R2],NUM):-
+		NUM = INDEX,
+		print_case_and_blanks(CASE),
+		NUM1 is NUM+1,
+		printBoard1(R1,R2,NUM1),!.
+		
+		
+
+% printligne(+CASE1,+CASE2,+CASE3)
+% écrite une ligne de 3 cases
+
+print_case_and_blanks(CASE1):-
+		write('|'),
+		printCase(CASE1),
+		length(CASE1,LCASE1),
+		NBBLANKS1 is 14 - LCASE1,
+		printBlanks(NBBLANKS1),
+		write('|').
+		
+% writeLine()
+% La fonction writeline dessine une ligne de 14*3 tirets
+
+writeline(0):-!.
+
+writeline(Length):-
+			write(-),
+			Length2 is Length-1,
+			writeline(Length2).
+			
+% printCase(+CASE)
+% écrit le contenu d'une case. Blanc = O, noir = X
+
+printCase([]):-!.
+
+printCase([PION|R]):-
+		(PION = 1,write('O');
+		 PION = 0,write('X')),!,
+		 printCase(R).
+		 
+% printBlanks(+LENGTH)
+% écrit des espaces sur une longueur LENGTH
+
+printBlanks(0):-!.
+
+printBlanks(Length):-
+			write(' '),
+			Length2 is Length-1,
+			printBlanks(Length2).

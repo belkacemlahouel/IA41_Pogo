@@ -20,6 +20,8 @@ private:
     int indexPionStack;
     int level;
     void think();
+    void think2();
+    void think3();
 
 public:
     AIPlayer(bool, int, Board*);

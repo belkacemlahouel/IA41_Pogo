@@ -13,6 +13,110 @@ AIPlayer::AIPlayer(bool isW, int lvl, Board* b) {
     board = b;
 }
 
+/* deuxième version du prédicat think, juste pour le test*/
+void AIPlayer::think3(){
+
+    if (m_PrologInterface.start( "think", 2 )){
+        term_t stimulus_list = (m_PrologInterface.funcNewTermRef)();
+        term_t hResponse;
+        int32 stimulus_size;
+        int rep[3];
+
+        hResponse = m_PrologInterface.FirstTerm+1;
+        m_PrologInterface.cleanList( m_PrologInterface.FirstTerm );
+        stimulus_size = 3;
+        float64* m_StimulusRawData = new float64 [stimulus_size];
+
+        for( int32 i = 0; i < stimulus_size; ++i )
+        {
+            m_StimulusRawData[i] = (float64) i;
+        }
+
+        m_PrologInterface.putList( stimulus_list, stimulus_size,
+        m_StimulusRawData ); // initialise une liste Prolog à partir d'un tableau de 10éléments 0,1,...,9
+        m_PrologInterface.consList( m_PrologInterface.FirstTerm, stimulus_list
+        ); // Le premier argument du prédicat “think” est une liste
+        delete( m_StimulusRawData );
+        std::vector<float64> response;
+        if (m_PrologInterface.call())
+        {
+
+            m_PrologInterface.getList( hResponse, response ); // récupère uneliste instanciée par le prédicat en tant que vector<float64>
+        }
+
+        rep[0] = response[0];
+        rep[1] = response[1];
+        rep[2] = response[2];
+
+        m_PrologInterface.finish();
+    }
+
+}
+
+/* deuxième version du prédicat think, juste pour le test*/
+void AIPlayer::think2(){
+
+    if (m_PrologInterface.start( "think", 2 ))
+    {
+        term_t stimulus_list = (m_PrologInterface.funcNewTermRef)();
+        term_t hResponse;
+        int32 stimulus_size_etat;
+        hResponse = m_PrologInterface.FirstTerm+1;
+        m_PrologInterface.cleanList( m_PrologInterface.FirstTerm );
+        stimulus_size_etat = 22;
+        int32 etat[22];
+        float64 etatDebug[22];
+
+        if(isWhite) etat[0] = (int32) 1;
+        else        etat[0] = (int32) 0;
+        if(isWhite) etatDebug[0] = (float64) 1;
+        else        etatDebug[0] = (float64) 0;
+
+        int n = 1;
+
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                Case* ca = &(board->board[j][i]);
+                list<Pawn*>& pawns = ca->pawnList;
+                list<Pawn*>::reverse_iterator it;
+
+                // Ordre stack : top = premier
+                int length = pawns.size();
+                for (it = pawns.rbegin(); it != pawns.rend(); ++it) {
+                    Pawn* tmp = *it;
+                    if (tmp->getIsWhite())       etat[n] = (int32) 1; // White pawn
+                    else                         etat[n] = (int32) 0; // Black pawn
+                    if (tmp->getIsWhite())       etatDebug[n] = (float64) 1; // White pawn
+                    else                         etatDebug[n] = (float64) 0; // Black pawn
+                    ++ n;
+                }
+                // Next case
+                etat[n] = (int32) -1;
+                etatDebug[n] = -1;
+                ++n;
+            }
+        }
+
+        m_PrologInterface.putList( stimulus_list, stimulus_size_etat, etat ); // initialise une liste Prolog à partir d'un tableau de 10 éléments 0,1,...,9
+
+        m_PrologInterface.consList( m_PrologInterface.FirstTerm, stimulus_list); // Le premier argument du prédicat “think” est une liste
+
+        delete(etat);
+
+        if (m_PrologInterface.call()){
+            std::vector<int32> response;
+            if(m_PrologInterface.getList( hResponse, response )){ // récupère une liste instanciée par le prédicat en tant que vector<float64>
+                nCaseDepart = response[0];
+                nCaseArrivee = response[1];
+                indexPionStack = response[2];
+            } else {
+                qDebug()<<"Impossible d'appeller le predicat...\n";
+            }
+        }
+        m_PrologInterface.finish();
+    }
+}
+
 // -------------------------------------------------------------------------
 // Using Prolog predicates to think
 // "think " is the name of the predicate we will use
@@ -24,7 +128,10 @@ void AIPlayer::think() {
     if (m_PrologInterface.start("think", 3)) {
 
         // Board creation in Prolog format
-        int32* etat = new int32[21];
+        int32 stimulus_size_etat = 21;
+        int32 stimulus_size_player = 2;
+        float64* etat = new float64[stimulus_size_etat];
+
         int n = 0;
 
         for (int i = 0; i < 3; ++i) {
@@ -52,7 +159,8 @@ void AIPlayer::think() {
         term_t hEtat = (m_PrologInterface.funcNewTermRef)();
         m_PrologInterface.cleanList(m_PrologInterface.FirstTerm);
         // On met la liste au format C++ dans un format Prolog
-        m_PrologInterface.putList(hEtat, 21, etat);
+        m_PrologInterface.putList(hEtat, stimulus_size_etat, etat);
+        delete(etat);
 
         /* LE BUG PROVIENT D'ENTRE ICI <<<<<<<<<<<<<<<<<<< */
 
@@ -62,7 +170,7 @@ void AIPlayer::think() {
 
         // On pourrait se dÃ©brouiller pour mettre Ã§a dans l'Ã©tat
         // Contient des infos player : couleur, niveau
-        int32* cPlayer = new int32[2];
+        float64* cPlayer = new float64[stimulus_size_player];
 
         // RÃ©cupÃ©ration des infos du joueur : couleur
         if (isWhite) cPlayer[0] = 1;
@@ -71,7 +179,8 @@ void AIPlayer::think() {
         cPlayer[1] = level;
 
         term_t hCPlayer = (m_PrologInterface.funcNewTermRef)();
-        m_PrologInterface.putList(hCPlayer, 2, cPlayer);
+        m_PrologInterface.putList(hCPlayer, stimulus_size_player, cPlayer);
+        delete(cPlayer);
 
         term_t ptrTerm = m_PrologInterface.FirstTerm+1;
         m_PrologInterface.cleanList(ptrTerm);
@@ -118,7 +227,7 @@ void AIPlayer::play(QEventLoop* pause) {
         //indexPionStack = 1;
         /* ********************* */
 
-    this->think();
+    this->think3();
 
     // On rÃ©cupÃ¨re le pion et on le sÃ©lectionne ############################
     Pawn* selectedPawn;
