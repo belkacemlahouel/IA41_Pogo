@@ -54,16 +54,16 @@ eval_pion(0, -1).		% pion noir
 % eval1([ETAT], EVAL).
 % -----------------------------------------------------------------------------
 
-% ------------ NIGHLTY ----------------
-% eval1(ETAT, E) :- E is 0,
-% 					eval1(ETAT, E, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
-% eval1([], _, 0) :- !.
-% eval1([-1|R], E, _) :- eval1(R, E, 0).		% Si on trouve un -1, C <- 0
-% eval1([_|R], E, 4) :-	 eval1(R, E, 4).		% Si C = 4, vers la prochaine
-% eval1([X|R], E, C) :- eval_pion(X, XE),	% Sinon, on evalue le pion
-% 						C1 is C+1,			% On incrémente le compteur
-%						E1 is E+XE,			% On mets à jour l'éval
-%						eval1(R, E1, C1).	% On évalue le reste
+
+% ------------------------
+% ------------------------
+% Appel de la fonction d'évaluation en fonction du niveau...
+% eval(1, ETAT, E) :- eval1(ETAT, E), !.
+% eval(0, ETAT, E) :- eval0(ETAT, E), !.
+% ... à modifier de toutes façons
+% ------------------------
+% ------------------------
+
 
 % ------------ Fonctionnel ------------
 eval(ETAT, E) :- eval1(ETAT, E, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
@@ -77,7 +77,20 @@ eval1([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 						eval1(R, E1, C1),	% On évalue le reste
 						E is E1+XE.			% On mets à jour l'éval
 
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% eval0([ETAT], EVAL) : nombre de stacks contrôlés par un joueur
+% -----------------------------------------------------------------------------
 
+eval0([], 0, 0) :- !.
+eval0([-1|R], E, _) :- 	eval0(R, E, 0), !.		% Si on trouve un -1, C <- 0
+eval0([_|R], E, 1) :-	eval0(R, E, 1), !.		% Si C = 1, vers la prochaine
+
+eval0([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
+ 						C1 is C+1,			% On incrémente le compteur
+						eval0(R, E1, C1),	% On évalue le reste
+						E is E1+XE.			% On mets à jour l'éval
 
 % #############################################################################
 % Fonction qui nous donne le nouvel état en fonction de ce qu'on veut jouer
