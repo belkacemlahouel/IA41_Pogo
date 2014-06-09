@@ -1,4 +1,4 @@
-:-module(mod_ia,[coups_possibles_joueur/3,minmax/4]).
+:-module(mod_ia,[coups_possibles_joueur/3,minmax/4,inverser_joueur/2,cases/3,nouvel_etat/5]).
 :- use_module('gui.pl').
 
 % -----------------------------------------------------------------------------
