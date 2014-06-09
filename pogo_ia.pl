@@ -58,8 +58,9 @@ eval_pion(0, -1).		% pion noir
 % ------------------------
 % ------------------------
 % Appel de la fonction d'évaluation en fonction du niveau...
-% eval(1, ETAT, E) :- eval1(ETAT, E), !.
-% eval(0, ETAT, E) :- eval0(ETAT, E), !.
+% eval(1, ETAT, E) :- eval1(ETAT, E, 0), !.
+% eval(0, ETAT, E) :- eval0(ETAT, E, 0), !.
+% eval(2, ETAT, E) :- eval2(ETAT, E, 0), !.
 % ... à modifier de toutes façons
 % ------------------------
 % ------------------------
