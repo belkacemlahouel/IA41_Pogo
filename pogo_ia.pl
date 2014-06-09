@@ -1,4 +1,7 @@
-% ------------------------------------qsdq----qsdqsd-------------------------------------
+:-module(mod_ia,[coups_possibles_joueur/3,minmax/4]).
+:- use_module('gui.pl').
+
+% -----------------------------------------------------------------------------
 % ETAT est codé comme suit :
 %		-1 pour dire qu'on passe à la case suivante
 %		1  pour désigner un pion blanc
@@ -35,34 +38,6 @@
 % 4 5 6
 % 7 8 9
 % -----------------------------------------------------------------------------
-
-% Pour sauvegarder l'état du jeu
-:- dynamic actualState/1.
-
-% actualState(-ETAT)
-% conserve l'état actuel du plateau. Ce prédicat est dynamique, on y insère sans arrêt le nouveau état, et on supprime l'ancien
-% il ne contient donc pas de clause à proprement parler
-
-% initial_state(-ETAT)
-% renvoie l'état initial d'une partie
-
-initial_state(ETAT):-
-		ETAT = [1,1,-1,1,1,-1,1,1,-1,-1,-1,-1,0,0,-1,0,0,-1,0,0,-1].
-
-% set_initial_state/0
-% ce prédicat enregistre l'état initial en tant qu'état actuel. Nécessaire pour le tout début du jeu.
-		
-set_initial_state:-
-    retractall(actualState(_)),
-    initial_state(E),
-    assert(actualState(E)).
-		
-% saveState(+COUP)
-% Sauvegarde le coup joué
-saveState([D,A,I]) :-
-    retract(actualState(E)),
-    nouvel_etat(E,D,A,I,E1),
-    assert(actualState(E1)).
 
 
 % #############################################################################
@@ -416,132 +391,3 @@ betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
 inverser_joueur(1,0).
 inverser_joueur(0,1).
 
-
-
-
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%
-%
-%		PARTIE INTERFACE GRAPHIQUE
-%
-%
-%
-	
-% play/0
-% fonction sans paramètres qui est appellée au départ. Démarre tout simplement le jeu.
-% AJOUTER UNE FONCTION PLAY et PLAY_IA pour demander au joueur et à l'IA le coup qu'ils veulent jouer.
-
-play :-
-	write('Niveau (IA) :\n'),
-	write('\t0.\tCROIX (noirs)\n'),
-	write('\t1.\tRONDS (blancs)\n'),
-	ask_id(JOUEUR),
-	initial_state(E),
-	play(E, JOUEUR).
-	
-ask_player(ID) :-
-	read(ID),
-	integer(ID),
-	between(0, 1, ID), !.
-	
-ask_player(ID) :-
-	writeln('Choix invalide. Options : 0 ou 1\n'),
-	ask_id(ID).
-
-% printBoard(+ETAT)
-% La fonction printBoard prend en paramètre un état, et en ressort une représentation console de ce dernier
-
-printBoard(ETAT):- % BUG QUAND LA DERNIERE CASE DES VIDE !?
-			cases(ETAT,CASES,INDEXES),
-			writeline(48),
-			printBoard1(CASES,INDEXES,1).
-			
-printBoard1([],[],10):-
-		write('\n'),
-		writeline(48),!.
-		
-printBoard1([],[],_):- % si la dernière case est vide
-		print_case_and_blanks([]),
-		write('\n'),
-		writeline(48),!.
-		
-printBoard1(CASELIST,[INDEX|R2],NUM):-
-		INDEX \= NUM,
-		member(NUM,[1,4,7]),
-		write('\n'),
-		print_case_and_blanks([]),
-		NUM1 is NUM+1,
-		printBoard1(CASELIST,[INDEX|R2],NUM1),!.
-		
-printBoard1([CASE|R1],[INDEX|R2],NUM):-
-		NUM = INDEX,
-		member(NUM,[1,4,7]),
-		write('\n'),
-		print_case_and_blanks(CASE),
-		NUM1 is NUM+1,
-		printBoard1(R1,R2,NUM1),!.
-		
-printBoard1(CASELIST,[INDEX|R2],NUM):-
-		INDEX \= NUM,
-		print_case_and_blanks([]),
-		NUM1 is NUM+1,
-		printBoard1(CASELIST,[INDEX|R2],NUM1),!.
-		
-printBoard1([CASE|R1],[INDEX|R2],NUM):-
-		NUM = INDEX,
-		print_case_and_blanks(CASE),
-		NUM1 is NUM+1,
-		printBoard1(R1,R2,NUM1),!.
-		
-		
-
-% printligne(+CASE1,+CASE2,+CASE3)
-% écrite une ligne de 3 cases
-
-print_case_and_blanks(CASE1):-
-		write('|'),
-		printCase(CASE1),
-		length(CASE1,LCASE1),
-		NBBLANKS1 is 14 - LCASE1,
-		printBlanks(NBBLANKS1),
-		write('|').
-		
-% writeLine()
-% La fonction writeline dessine une ligne de 14*3 tirets
-
-writeline(0):-!.
-
-writeline(Length):-
-			write(-),
-			Length2 is Length-1,
-			writeline(Length2).
-			
-% printCase(+CASE)
-% écrit le contenu d'une case. Blanc = O, noir = X
-
-printCase([]):-!.
-
-printCase([PION|R]):-
-		(PION = 1,write('O');
-		 PION = 0,write('X')),!,
-		 printCase(R).
-		 
-% printBlanks(+LENGTH)
-% écrit des espaces sur une longueur LENGTH
-
-printBlanks(0):-!.
-
-printBlanks(Length):-
-			write(' '),
-			Length2 is Length-1,
-			printBlanks(Length2).
