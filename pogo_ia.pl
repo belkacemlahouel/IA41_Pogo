@@ -91,6 +91,27 @@ eval0([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
  						C1 is C+1,			% On incrémente le compteur
 						eval0(R, E1, C1),	% On évalue le reste
 						E is E1+XE.			% On mets à jour l'éval
+						
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% eval2([ETAT], EVAL) : nombre de stacks contrôlés par un joueur
+% -----------------------------------------------------------------------------
+
+eval0([], 0, 0) :- !.
+eval0([-1|R], E, _) :- 	eval0(R, E, 0), !.		% Si on trouve un -1, C <- 0
+eval0([_|R], E, 4) :-	eval0(R, E, 4), !.		% Si C = 1, vers la prochaine
+
+eval0([_|R], E, 0) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
+						XE2 is XE*2,		% Poids plus élevé pour la première pièce d'un stack
+ 						C1 is C+1,			% On incrémente le compteur
+						eval0(R, E1, C1),	% On évalue le reste
+						E is E1+XE.			% On mets à jour l'éval
+
+eval0([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
+ 						C1 is C+1,			% On incrémente le compteur
+						eval0(R, E1, C1),	% On évalue le reste
+						E is E1+XE.			% On mets à jour l'éval						
 
 % #############################################################################
 % Fonction qui nous donne le nouvel état en fonction de ce qu'on veut jouer
