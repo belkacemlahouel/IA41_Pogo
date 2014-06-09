@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/new/images">
+        <file>pion_noir.png</file>
+        <file>pion_blanc.png</file>
+        <file>case.png</file>
+        <file>case150px.png</file>
+        <file>pion_blanc_select.png</file>
+        <file>pion_noir_select.png</file>
+    </qresource>
+</RCC>

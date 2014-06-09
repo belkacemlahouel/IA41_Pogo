@@ -1,15 +1,3 @@
-Récupération des infos du OptionMenu et instancier les Players correctement ?
-	Eventuellement bloquer le niveau pour un HumanPlayer...
-	Ca attends un coup "humain", même si je sélectionne AI dans le menu.
-
-Fermer correctement le jeu lors de la fermeture fenêtre
-
-Tests pour l'appel prédicats.
-
-Compilation : dernière étape du tuto du prof (avec le batch...), avant de tester
-
-On pourrait commencer par l'appel à la fonction AIPlayer::play
-	Paramètres prédéfinis, vérifier si elle marche déjà
-	Pour cela, j'ai besoin de l'instanciation correcte des joueurs
-	J'ai peur d'y toucher et de foutre le bordel
+- faire un menu de choix de niveaux/joueur (IA vs IA, IA vs Joueur blanc ou noir...)
+- faire une interface en prolog
 
