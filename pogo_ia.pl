@@ -58,16 +58,24 @@ eval_pion(0, -1).		% pion noir
 % ------------------------
 % ------------------------
 % Appel de la fonction d'évaluation en fonction du niveau...
-% eval(1, ETAT, E) :- eval1(ETAT, E), !.
-% eval(0, ETAT, E) :- eval0(ETAT, E), !.
+% eval(1, ETAT, E) :- eval1(ETAT, E, 0), !.
+% eval(0, ETAT, E) :- eval0(ETAT, E, 0), !.
+% eval(2, ETAT, E) :- eval2(ETAT, E, 0), !.
 % ... à modifier de toutes façons
 % ------------------------
 % ------------------------
 
 
-% ------------ Fonctionnel ------------
-eval(ETAT, E) :- eval1(ETAT, E, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+% ------------ DEPRECATED INTERFACE COURANTE ------------
+eval(ETAT, E) :- eval0(ETAT, E, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+% ------------------------
+% ------------------------
 
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% eval1([ETAT], EVAL) : 4 premiers pions
+% -----------------------------------------------------------------------------
 eval1([], 0, 0) :- !.
 eval1([-1|R], E, _) :- 	eval1(R, E, 0), !.		% Si on trouve un -1, C <- 0
 eval1([_|R], E, 4) :-	eval1(R, E, 4), !.		% Si C = 4, vers la prochaine
@@ -95,22 +103,21 @@ eval0([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
-% eval2([ETAT], EVAL) : nombre de stacks contrôlés par un joueur
+% eval2([ETAT], EVAL) : 4 premiers pions + poids double pour le contrôle
 % -----------------------------------------------------------------------------
 
-eval0([], 0, 0) :- !.
-eval0([-1|R], E, _) :- 	eval0(R, E, 0), !.		% Si on trouve un -1, C <- 0
-eval0([_|R], E, 4) :-	eval0(R, E, 4), !.		% Si C = 1, vers la prochaine
+eval2([], 0, 0) :- !.
+eval2([-1|R], E, _) :- 	eval2(R, E, 0), !.		% Si on trouve un -1, C <- 0
+eval2([_|R], E, 4) :-	eval2(R, E, 4), !.		% Si C = 1, vers la prochaine
 
-eval0([_|R], E, 0) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
+eval2([X|R], E, 0) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 						XE2 is XE*2,		% Poids plus élevé pour la première pièce d'un stack
- 						C1 is C+1,			% On incrémente le compteur
-						eval0(R, E1, C1),	% On évalue le reste
-						E is E1+XE.			% On mets à jour l'éval
+						eval2(R, E1, 1),	% On évalue le reste
+						E is E1+XE2.		% On mets à jour l'éval
 
-eval0([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
+eval2([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
  						C1 is C+1,			% On incrémente le compteur
-						eval0(R, E1, C1),	% On évalue le reste
+						eval2(R, E1, C1),	% On évalue le reste
 						E is E1+XE.			% On mets à jour l'éval						
 
 % #############################################################################
