@@ -69,7 +69,7 @@ eval_pion(0, -1).		% pion noir
 eval(ETAT, E, LEVEL) :- 
 	(LEVEL = 0,eval0(ETAT, E, 0),!;
 	 LEVEL = 1,eval1(ETAT, E, 0),!;
-	 LEVEL = 2,eval2(ETAT, E, 0)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+	 LEVEL = 2,eval4(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 % ------------------------
 % ------------------------
 
@@ -129,9 +129,9 @@ eval2([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 % -----------------------------------------------------------------------------
 
 eval4(ETAT, EVAL) :- 	coups_possibles_joueur(ETAT, 1, COUPSW),
-						W is length(COUPSW),
+						length(COUPSW,W),
 						coups_possibles_joueur(ETAT, 0, COUPSB),
-						B is length(COUPSB),
+						length(COUPSB,B),
 						EVAL is W-B.
 
 % #############################################################################
@@ -384,13 +384,12 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 				
 % minmax(+ETAT,+JOUEUR,+DEPTH,-COUP, +LEVEL)
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
-% la profondeur de la recherche est caractérisée par DEPTH. Les niveau 0 et 1 se voient attribuer une profondeur de réflexion de 3,
-% le niveau 2 se voit attribuer une profondeur supplémentaire
+% la profondeur de la recherche est caractérisée par DEPTH. On donne des profondeurs différentes en fonction du niveau du joueur.
 
 minmax(ETAT,JOUEUR,BESTCOUP,LEVEL):-
-				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT,DEPTH);
-				LEVEL = 1,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT,DEPTH);
-				LEVEL = 2, DEPTH = 4, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT,DEPTH)).
+				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT1,DEPTH);
+				LEVEL = 1,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT2,DEPTH);
+				LEVEL = 2, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT3,DEPTH)).
 				 % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
 
 % alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
