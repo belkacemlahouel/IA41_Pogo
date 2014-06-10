@@ -65,7 +65,6 @@ eval_pion(0, -1).		% pion noir
 % ------------------------
 % ------------------------
 
-
 % ------------ APPEL DE L'EVALUATION DEPUIS LA FONCTION DE JEU ------------
 eval(ETAT, E, LEVEL) :- 
 	(LEVEL = 0,eval0(ETAT, E, 0),!;
@@ -121,7 +120,19 @@ eval2([X|R], E, 0) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 eval2([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
  						C1 is C+1,			% On incrémente le compteur
 						eval2(R, E1, C1),	% On évalue le reste
-						E is E1+XE.			% On mets à jour l'éval						
+						E is E1+XE.			% On mets à jour l'éval
+						
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% eval4(+ETAT, -EVAL) : compte le nombre de coups pour chaque joueur
+% -----------------------------------------------------------------------------
+
+eval4(ETAT, EVAL) :- 	coups_possibles_joueur(ETAT, 1, COUPSW),
+						W is length(COUPSW),
+						coups_possibles_joueur(ETAT, 0, COUPSB),
+						B is length(COUPSB),
+						EVAL is W-B.
 
 % #############################################################################
 % Fonction qui nous donne le nouvel état en fonction de ce qu'on veut jouer
