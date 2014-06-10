@@ -41,3 +41,8 @@ Il faut réussir à compter la puissance de contrôle d'un stack
 Peut-être changer la fonction d'évaluation en fonction du niveau d'IA
 	Faire en sorte qu'elle soit "gentille"/agressive/passive...
 
+------------------- (4) -------------------------
+Compter le nombre de coups pour chaque joueur
+	On tient compte d'un paramètre de mobilité de chaque joueur
+	Celui qui ne peut plus bouger perds...
+
