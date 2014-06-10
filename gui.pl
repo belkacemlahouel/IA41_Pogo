@@ -27,7 +27,18 @@ main:-
 	write('\t0.\tIA vs IA\n'),
 	write('\t1.\tIA vs JOUEUR\n'),
 	ask_player(REP),
-	(REP = 0, play_iaonly,!;
+	(REP = 0, 
+	write('Choisissez le niveau des blancs :\n'),
+	write('\t0.\tFaible\n'),
+	write('\t1.\tMoyen\n'),
+	write('\t2.\tBon\n'),
+	ask_level(LEVEL1),
+	write('Choisissez le niveau des noirs :\n'),
+	write('\t0.\tFaible\n'),
+	write('\t1.\tMoyen\n'),
+	write('\t2.\tBon\n'),
+	ask_level(LEVEL2),
+	play_iaonly(LEVEL1,LEVEL2),!;
 	 REP = 1, play).
 	
 
@@ -53,25 +64,25 @@ ask_placement(PL, COUP, JOUEUR) :-
 % play_ia(+ETAT,+JOUEUR)
 % fonction de jeu de l'IA
 
-play_ia(ETAT,JOUEUR):-
-		minmax(ETAT,JOUEUR,3,[D,A,I]),% demander le déplacement
+play_ia(ETAT,JOUEUR,LEVEL):-
+		minmax(ETAT,JOUEUR,[D,A,I],LEVEL),% demander le déplacement
 		nouvel_etat(ETAT,D,A,I,NETAT),
 		write('\nIA a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n\n'),
 		inverser_joueur(JOUEUR,J1),
 		(won(NETAT,JOUEUR),!;
-		play_hmn(NETAT,J1)).
+		play_hmn(NETAT,J1,LEVEL)).
 
 % play_hmn(+ETAT,+JOUEUR)
 % fonction de jeu du joueur (humain)
 
-play_hmn(ETAT,JOUEUR):-
+play_hmn(ETAT,JOUEUR,LEVEL):-
 		printBoard(ETAT),% montrer le plateau
 		ask_placement(ETAT,[D,A,I],JOUEUR),% demander le déplacement
 		nouvel_etat(ETAT,D,A,I,NETAT),
 		printBoard(NETAT),% montrer le nouveau plateau
 		inverser_joueur(JOUEUR,J1),
 		(won(NETAT,JOUEUR),!;
-		play_ia(NETAT,J1)).
+		play_ia(NETAT,J1,LEVEL)).
 
 % play/0
 % fonction sans paramètres qui est appellée au départ. Démarre tout simplement le jeu joueur VS ia
@@ -81,29 +92,45 @@ play :-
 	write('\t0.\tCROIX (noirs)\n'),
 	write('\t1.\tRONDS (blancs)\n'),
 	ask_player(JOUEUR),
+	write('Choisissez le niveau de IA :\n'),
+	write('\t0.\tFaible\n'),
+	write('\t1.\tMoyen\n'),
+	write('\t2.\tBon\n'),
+	ask_level(LEVEL),
 	initial_state(E),
-	(JOUEUR = 0,play_ia(E,1);		% c'est toujours aux blancs de démarrer
-	 JOUEUR = 1,play_hmn(E,JOUEUR)).
+	(JOUEUR = 0,play_ia(E,1,LEVEL);		% c'est toujours aux blancs de démarrer
+	 JOUEUR = 1,play_hmn(E,JOUEUR,LEVEL)).
 	 
 % play_iaonly/0
 % tout comme play, mais lorsqu'on décide de regarder deux IA jouer l'une contre l'autre
 
-play_iaonly :-
+play_iaonly(LEVEL1,LEVEL2) :-
 	initial_state(E),
 	printBoard(E),
-	play_iaonly(E,1).
+	play_iaonly(E,1,LEVEL1,LEVEL2).
 	 
 % play_ia(+ETAT,+JOUEUR)
 % fonction de jeu de l'IA
 
-play_iaonly(ETAT,JOUEUR):-
-		minmax(ETAT,JOUEUR,3,[D,A,I]),% demander le déplacement
+play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
+		JOUEUR = 1,
+		minmax(ETAT,JOUEUR,[D,A,I],LEVEL1),% demander le déplacement
 		nouvel_etat(ETAT,D,A,I,NETAT),
-		write('\nIA a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
+		write('\nIA blancs a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
 		printBoard(NETAT),
 		inverser_joueur(JOUEUR,J1),
 		(won(NETAT,JOUEUR),!;
-		play_iaonly(NETAT,J1)).
+		play_iaonly(NETAT,J1,LEVEL1,LEVEL2)).
+		
+play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
+		JOUEUR = 0,
+		minmax(ETAT,JOUEUR,[D,A,I],LEVEL2),% demander le déplacement
+		nouvel_etat(ETAT,D,A,I,NETAT),
+		write('\nIA noirs a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
+		printBoard(NETAT),
+		inverser_joueur(JOUEUR,J1),
+		(won(NETAT,JOUEUR),!;
+		play_iaonly(NETAT,J1,LEVEL1,LEVEL2)).
 
 % ask_player(-ID)
 % demande au joueur s'il souhaite incarner les noirs (croix) ou les ronds (blancs), avec vérification de la réponse.
@@ -116,6 +143,18 @@ ask_player(ID) :-
 ask_player(ID) :-
 	writeln('Choix invalide. Options : 0 ou 1\n'),
 	ask_player(ID).
+	
+% ask_level(-LEVEL)
+% demande au joueur le niveau de l'IA (contre laquelle il va jouer, ou pour l'IA vs IA) 
+	
+ask_level(LEVEL) :-
+	read(LEVEL),
+	integer(LEVEL),
+	between(0, 2, LEVEL), !.
+	
+ask_level(LEVEL) :-
+	writeln('Choix invalide. Options : 0, 1, ou 2\n'),
+	ask_level(LEVEL).
 
 % won(+ETAT,+JOUEUR)
 % regarde si JOUEUR est gagnant, à l'état donné ETAT
@@ -125,7 +164,7 @@ won(ETAT,JOUEUR):-
 		won1(CASES,JOUEUR).
 		
 won1([],JOUEUR):-
-	(JOUEUR = 1, write('Les blancs (ronds) ont gagné.\n');
+	(JOUEUR = 1, write('Les blancs (ronds) ont gagné.\n'),!;
 	 JOUEUR = 0, write('Les noirs (croix) ont gagné.\n')).
 
 won1([[J|_]|R],J):-

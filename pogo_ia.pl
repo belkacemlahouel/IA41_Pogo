@@ -1,4 +1,4 @@
-:-module(mod_ia,[coups_possibles_joueur/3,minmax/4,inverser_joueur/2,cases/3,nouvel_etat/5]).
+:-module(mod_ia,[coups_possibles_joueur/3,minmax/4,inverser_joueur/2,cases/3,nouvel_etat/5,eval/3]).
 :- use_module('gui.pl').
 
 % -----------------------------------------------------------------------------
@@ -66,8 +66,11 @@ eval_pion(0, -1).		% pion noir
 % ------------------------
 
 
-% ------------ DEPRECATED INTERFACE COURANTE ------------
-eval(ETAT, E) :- eval0(ETAT, E, 0). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+% ------------ APPEL DE L'EVALUATION DEPUIS LA FONCTION DE JEU ------------
+eval(ETAT, E, LEVEL) :- 
+	(LEVEL = 0,eval0(ETAT, E, 0),!;
+	 LEVEL = 1,eval1(ETAT, E, 0),!;
+	 LEVEL = 2,eval2(ETAT, E, 0)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 % ------------------------
 % ------------------------
 
@@ -111,7 +114,7 @@ eval2([-1|R], E, _) :- 	eval2(R, E, 0), !.		% Si on trouve un -1, C <- 0
 eval2([_|R], E, 4) :-	eval2(R, E, 4), !.		% Si C = 1, vers la prochaine
 
 eval2([X|R], E, 0) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
-						XE2 is XE*2,		% Poids plus élevé pour la première pièce d'un stack
+						XE2 is XE*4,		% Poids plus élevé pour la première pièce d'un stack
 						eval2(R, E1, 1),	% On évalue le reste
 						E is E1+XE2.		% On mets à jour l'éval
 
@@ -368,47 +371,51 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 						append(E1,E2,NETATS),
 						etats_possibles_joueur1(ETAT,R1,R2,E2).
 				
-% minmax(+ETAT,+JOUEUR,+DEPTH,-COUP)
+% minmax(+ETAT,+JOUEUR,+DEPTH,-COUP, +LEVEL)
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
-% la profondeur de la recherche est caractérisée par DEPTH
+% la profondeur de la recherche est caractérisée par DEPTH. Les niveau 0 et 1 se voient attribuer une profondeur de réflexion de 3,
+% le niveau 2 se voit attribuer une profondeur supplémentaire
 
-minmax(ETAT,JOUEUR,DEPTH,BESTCOUP):-
-				alphabeta(ETAT,JOUEUR,-10000,10000,BESTCOUP,_EVALETAT,DEPTH). % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
+minmax(ETAT,JOUEUR,BESTCOUP,LEVEL):-
+				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT,DEPTH);
+				LEVEL = 1,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT,DEPTH);
+				LEVEL = 2, DEPTH = 4, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT,DEPTH)).
+				 % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
 
 % alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
 %
 				
-alphabeta(ETAT, JOUEUR, Alpha, Beta, BESTCOUP, BESTEVAL, Depth) :-
+alphabeta(ETAT, JOUEUR, LEVEL, Alpha, Beta, BESTCOUP, BESTEVAL, Depth) :-
 	Depth > 0,
 	OneDeeper is Depth - 1,
 	coups_possibles_joueur(ETAT, JOUEUR, L),
 	length(L,LMOVES),
 	LMOVES > 0,
 	!,
-	boundedbest(ETAT,L, Alpha, Beta, JOUEUR, OneDeeper, BESTCOUP, BESTEVAL).
+	boundedbest(ETAT,L,LEVEL, Alpha, Beta, JOUEUR, OneDeeper, BESTCOUP, BESTEVAL).
   
-alphabeta(ETAT, _, _, _, _, Val, 0) :-
-		eval(ETAT,Val),!.
+alphabeta(ETAT, _,LEVEL, _, _, _, Val, 0) :-
+		eval(ETAT,Val,LEVEL),!.
 		
-alphabeta(ETAT, _, _, _, _, Val, _) :- % Si plus de coup avant d'avoir atteint la profondeur 0
-		eval(ETAT,Val).
+alphabeta(ETAT, _,LEVEL, _, _, _, Val, _) :- % Si plus de coup avant d'avoir atteint la profondeur 0
+		eval(ETAT,Val,LEVEL).
 
-boundedbest(ETAT,[[D,A,I]|NEXTCOUPS], Alpha, Beta, JOUEUR, Depth, BESTCOUP, BESTVAL) :-
+boundedbest(ETAT,[[D,A,I]|NEXTCOUPS],LEVEL, Alpha, Beta, JOUEUR, Depth, BESTCOUP, BESTVAL) :-
   inverser_joueur(JOUEUR, J2),
   nouvel_etat(ETAT,D,A,I,NEXTETAT),
-  alphabeta(NEXTETAT, J2, Alpha, Beta, _BESTCOUP, Val, Depth),
-  goodenough(ETAT,NEXTCOUPS,Depth, Alpha, Beta, JOUEUR, [D,A,I], Val, BESTCOUP, BESTVAL).
+  alphabeta(NEXTETAT, J2,LEVEL, Alpha, Beta, _BESTCOUP, Val, Depth),
+  goodenough(ETAT,NEXTCOUPS,LEVEL,Depth, Alpha, Beta, JOUEUR, [D,A,I], Val, BESTCOUP, BESTVAL).
 
-goodenough(_,[],_, _, _, _, COUP, Val, COUP, Val) :-!.   % On a fini la liste de coups
+goodenough(_,[],_,_, _, _, _, COUP, Val, COUP, Val) :-!.   % On a fini la liste de coups
 
-goodenough(_,_,_, Alpha, Beta, JOUEUR, COUP, Val, COUP, Val) :-
+goodenough(_,_,_,_, Alpha, Beta, JOUEUR, COUP, Val, COUP, Val) :-
   JOUEUR = 0, Val > Beta, !                 % MIN a dépassé la beta
   ;
   JOUEUR = 1, Val < Alpha, !.               % MAX est passé sous alpha
 
-goodenough(ETAT,MOVELIST,Depth, Alpha, Beta, JOUEUR, COUP, Val, BESTCOUP, BESTEVAL)  :-
+goodenough(ETAT,MOVELIST,LEVEL,Depth, Alpha, Beta, JOUEUR, COUP, Val, BESTCOUP, BESTEVAL)  :-
   newbounds(Alpha, Beta, JOUEUR, Val, NewAlpha, NewBeta),
-  boundedbest(ETAT,MOVELIST, NewAlpha, NewBeta, JOUEUR, Depth, COUP1, Val1),
+  boundedbest(ETAT,MOVELIST,LEVEL, NewAlpha, NewBeta, JOUEUR, Depth, COUP1, Val1),
   betterof(JOUEUR, COUP, Val, COUP1, Val1, BESTCOUP, BESTEVAL).
 
 newbounds(Alpha, Beta, JOUEUR, Val, Val, Beta)  :-
