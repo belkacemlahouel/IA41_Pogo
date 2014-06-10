@@ -385,7 +385,7 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 % minmax(+ETAT,+JOUEUR,+DEPTH,-COUP, -EVALETAT +LEVEL)
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH. On donne des profondeurs différentes en fonction du niveau du joueur.
-% EVALETAT est là en particulier pour le debug
+% EVALETAT est là en particulier pour le debug (voir si l'IA fait les bons choix)
 
 minmax(ETAT,JOUEUR,BESTCOUP,EVALETAT,LEVEL):-
 				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH);
