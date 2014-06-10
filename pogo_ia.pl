@@ -1,4 +1,4 @@
-:-module(mod_ia,[coups_possibles_joueur/3,minmax/4,inverser_joueur/2,cases/3,nouvel_etat/5,eval/3]).
+:-module(mod_ia,[coups_possibles_joueur/3,minmax/5,inverser_joueur/2,cases/3,nouvel_etat/5,eval/3]).
 :- use_module('gui.pl').
 
 % -----------------------------------------------------------------------------
@@ -125,7 +125,7 @@ eval2([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
-% eval4(+ETAT, -EVAL) : compte le nombre de coups pour chaque joueur
+% eval4(+ETAT, -EVAL) : compte le nombre de coups pour chaque joueur, l'évaluation est la différence entre les coups de MAX et ceux de MIN
 % -----------------------------------------------------------------------------
 
 eval4(ETAT, EVAL) :- 	coups_possibles_joueur(ETAT, 1, COUPSW),
@@ -382,14 +382,15 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 						append(E1,E2,NETATS),
 						etats_possibles_joueur1(ETAT,R1,R2,E2).
 				
-% minmax(+ETAT,+JOUEUR,+DEPTH,-COUP, +LEVEL)
+% minmax(+ETAT,+JOUEUR,+DEPTH,-COUP, -EVALETAT +LEVEL)
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH. On donne des profondeurs différentes en fonction du niveau du joueur.
+% EVALETAT est là en particulier pour le debug
 
-minmax(ETAT,JOUEUR,BESTCOUP,LEVEL):-
-				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT1,DEPTH);
-				LEVEL = 1,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT2,DEPTH);
-				LEVEL = 2, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,_EVALETAT3,DEPTH)).
+minmax(ETAT,JOUEUR,BESTCOUP,EVALETAT,LEVEL):-
+				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH);
+				LEVEL = 1,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH);
+				LEVEL = 2, DEPTH = 4, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH)).
 				 % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
 
 % alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
@@ -429,17 +430,17 @@ goodenough(ETAT,MOVELIST,LEVEL,Depth, Alpha, Beta, JOUEUR, COUP, Val, BESTCOUP, 
   betterof(JOUEUR, COUP, Val, COUP1, Val1, BESTCOUP, BESTEVAL).
 
 newbounds(Alpha, Beta, JOUEUR, Val, Val, Beta)  :-
-  JOUEUR = 0, Val > Alpha, !.               % Pour MAX, Lower bond augmente
+  JOUEUR = 0, Val > Alpha, !.               % Pour MIN, Lower bond augmente
 
 newbounds(Alpha, Beta, JOUEUR, Val, Alpha, Val)  :-
-  JOUEUR = 1, Val < Beta, !.                % Pour MIN, upper bond diminue
+  JOUEUR = 1, Val < Beta, !.                % Pour MAX, upper bond diminue
 
 newbounds(Alpha, Beta, _, _, Alpha, Beta).           % Rien ne change
 
 betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur que COUP2
-  JOUEUR = 0, Val1 > Val2, !
+  JOUEUR = 1, Val1 > Val2, !		% rappel : pour MAX (1), on cherche la valeur la plus HAUTE !!
   ;
-  JOUEUR = 1, Val1 < Val2, !.
+  JOUEUR = 0, Val1 < Val2, !.
 
 betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
 

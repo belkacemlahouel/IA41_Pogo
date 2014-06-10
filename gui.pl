@@ -1,4 +1,4 @@
-:-module(mod_ui,[main/0,printBoard/1]).
+:-module(mod_ui,[main/0,printBoard/1,won/2]).
 :-use_module('pogo_ia.pl').
 
 % initial_state(-ETAT)
@@ -65,9 +65,10 @@ ask_placement(PL, COUP, JOUEUR) :-
 % fonction de jeu de l'IA
 
 play_ia(ETAT,JOUEUR,LEVEL):-
-		minmax(ETAT,JOUEUR,[D,A,I],LEVEL),% demander le déplacement
+		minmax(ETAT,JOUEUR,[D,A,I],BESTEVAL,LEVEL),% demander le déplacement
 		nouvel_etat(ETAT,D,A,I,NETAT),
-		write('\nIA a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n\n'),
+		write('\nIA a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
+		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		inverser_joueur(JOUEUR,J1),
 		(won(NETAT,JOUEUR),!;
 		play_hmn(NETAT,J1,LEVEL)).
@@ -114,9 +115,10 @@ play_iaonly(LEVEL1,LEVEL2) :-
 
 play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
 		JOUEUR = 1,
-		minmax(ETAT,JOUEUR,[D,A,I],LEVEL1),% demander le déplacement
+		minmax(ETAT,JOUEUR,[D,A,I],BESTEVAL,LEVEL1),% demander le déplacement
 		nouvel_etat(ETAT,D,A,I,NETAT),
 		write('\nIA blancs a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
+		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		printBoard(NETAT),
 		inverser_joueur(JOUEUR,J1),
 		(won(NETAT,JOUEUR),!;
@@ -124,9 +126,10 @@ play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
 		
 play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
 		JOUEUR = 0,
-		minmax(ETAT,JOUEUR,[D,A,I],LEVEL2),% demander le déplacement
+		minmax(ETAT,JOUEUR,[D,A,I],BESTEVAL,LEVEL2),% demander le déplacement
 		nouvel_etat(ETAT,D,A,I,NETAT),
 		write('\nIA noirs a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
+		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		printBoard(NETAT),
 		inverser_joueur(JOUEUR,J1),
 		(won(NETAT,JOUEUR),!;
@@ -163,9 +166,7 @@ won(ETAT,JOUEUR):-
 		cases(ETAT,CASES,_INDEXES),
 		won1(CASES,JOUEUR).
 		
-won1([],JOUEUR):-
-	(JOUEUR = 1, write('Les blancs (ronds) ont gagné.\n'),!;
-	 JOUEUR = 0, write('Les noirs (croix) ont gagné.\n')).
+won1([],_).
 
 won1([[J|_]|R],J):-
 		won1(R,J).
