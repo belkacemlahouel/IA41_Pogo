@@ -413,7 +413,9 @@ minmax(ETAT,JOUEUR,BESTCOUP,EVALETAT,LEVEL):-
 				 % -10000 et 10000 sont des valeurs excessivement grandes pour simuler +inf et -inf
 
 % alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
-% effectue un minmax avec élaga alpha-beta
+% effectue un minmax avec élagage alpha-beta
+% la décrémentation de la profondeur, recherche des coups possibles pour le joueur, et on
+% continue en profondeur tant qu'on peut
 				
 alphabeta(ETAT, JOUEUR, LEVEL, Alpha, Beta, BESTCOUP, BESTEVAL, Depth) :-
 	Depth > 0,
@@ -441,6 +443,8 @@ boundedbest(ETAT,[[D,A,I]|NEXTCOUPS],LEVEL, Alpha, Beta, JOUEUR, Depth, BESTCOUP
   goodenough(ETAT,NEXTCOUPS,LEVEL,Depth, Alpha, Beta, JOUEUR, [D,A,I], Val, BESTCOUP, BESTVAL).
 
 % goodenough(+ETAT,+MOVELIST,+LEVEL,+Depth, +Alpha, +Beta, +JOUEUR, +COUP, Val, BESTCOUP, BESTEVAL)
+% goodenough est le prédicat chargé d'évaluer de comparer les évaluations qu'il reçoit avec
+% alpha et beta. C'est lui qui se charge de cut (de l'élagage)
   
 goodenough(_,[],_,_, _, _, _, COUP, Val, COUP, Val) :-!.   % On a fini la liste de coups
 
@@ -454,6 +458,9 @@ goodenough(ETAT,MOVELIST,LEVEL,Depth, Alpha, Beta, JOUEUR, COUP, Val, BESTCOUP, 
   boundedbest(ETAT,MOVELIST,LEVEL, NewAlpha, NewBeta, JOUEUR, Depth, COUP1, Val1),
   betterof(JOUEUR, COUP, Val, COUP1, Val1, BESTCOUP, BESTEVAL).
 
+% newbounds(+Alpha, +Beta, +JOUEUR, +Val, -NewAlpha, -NewBeta)
+% ce prédicat est chargé de mettre à jour Alpha ou Beta selon les conditions rencontrées
+ 
 newbounds(Alpha, Beta, JOUEUR, Val, Val, Beta)  :-
   JOUEUR = 0, Val > Alpha, !.               % Pour MIN, Lower bond augmente
 
@@ -461,6 +468,10 @@ newbounds(Alpha, Beta, JOUEUR, Val, Alpha, Val)  :-
   JOUEUR = 1, Val < Beta, !.                % Pour MAX, upper bond diminue
 
 newbounds(Alpha, Beta, _, _, Alpha, Beta).           % Rien ne change
+
+% betterof(+JOUEUR, +COUP1, +Val1, +COUP2, +Val2, -BESTCOUP, -BESTEVAL)
+% Choisit le meilleur coup entre COUP1 et COUP2, et le stocke dans BESTCOUP (et BESTEVAL)
+% Si les coups sont égaux, on choisit l'un des deux au hasard.
 
 betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur que COUP2
   JOUEUR = 1, Val1 > Val2, !		% rappel : pour MAX (1), on cherche la valeur la plus HAUTE !!
@@ -473,7 +484,7 @@ betterof(_, COUP1, Val1, COUP2, Val2, RANDCOUP, RANDVAL)  :-  % COUP1 et COUP2 s
   (R = 0, RANDCOUP = COUP1, RANDVAL = Val1,!;
    R = 1, RANDCOUP = COUP2, RANDVAL = Val2).
 
-betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
+betterof(_, _, _, COUP2, Val2, COUP2, Val2).     % sinon COUP2 est meilleur
 
 % inverser_joueur(+J1,-J2).
 % transforme J1 = 1 en J2 = 0 et vice versa
