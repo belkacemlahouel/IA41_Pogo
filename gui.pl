@@ -55,7 +55,7 @@ ask_placement(PL, [D,A,I], JOUEUR) :-
 	write('\nIndex du pion : '),
 	read(I),
 	coups_possibles_joueur(PL,JOUEUR,COUPS),
-	member([D,A,I],COUPS).
+	member([D,A,I],COUPS),!.
 
 ask_placement(PL, COUP, JOUEUR) :-
 	write('Mauvais deplacement... Recommencez.\n'),
@@ -70,7 +70,7 @@ play_ia(ETAT,JOUEUR,LEVEL):-
 		write('\nIA a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
 		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		inverser_joueur(JOUEUR,J1),
-		(won(NETAT,JOUEUR),!;
+		(won(NETAT,JOUEUR),!,write('Vous avez perdu...');
 		play_hmn(NETAT,J1,LEVEL)).
 
 % play_hmn(+ETAT,+JOUEUR)
@@ -78,11 +78,11 @@ play_ia(ETAT,JOUEUR,LEVEL):-
 
 play_hmn(ETAT,JOUEUR,LEVEL):-
 		printBoard(ETAT),% montrer le plateau
-		ask_placement(ETAT,[D,A,I],JOUEUR),% demander le déplacement
+		ask_placement(ETAT,[D,A,I],JOUEUR),!,% demander le déplacement
 		nouvel_etat(ETAT,D,A,I,NETAT),
 		printBoard(NETAT),% montrer le nouveau plateau
 		inverser_joueur(JOUEUR,J1),
-		(won(NETAT,JOUEUR),!;
+		(won(NETAT,JOUEUR),!,write('Vous avez gagne !\n');
 		play_ia(NETAT,J1,LEVEL)).
 
 % play/0
@@ -121,7 +121,7 @@ play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
 		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		printBoard(NETAT),
 		inverser_joueur(JOUEUR,J1),
-		(won(NETAT,JOUEUR),!;
+		(won(NETAT,JOUEUR),!,write('Les blancs on gagne !!\n');
 		play_iaonly(NETAT,J1,LEVEL1,LEVEL2)).
 		
 play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
@@ -132,7 +132,7 @@ play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
 		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		printBoard(NETAT),
 		inverser_joueur(JOUEUR,J1),
-		(won(NETAT,JOUEUR),!;
+		(won(NETAT,JOUEUR),!,write('Les noirs on gagne !!\n');
 		play_iaonly(NETAT,J1,LEVEL1,LEVEL2)).
 
 % ask_player(-ID)

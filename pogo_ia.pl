@@ -67,9 +67,9 @@ eval_pion(0, -1).		% pion noir
 
 % ------------ APPEL DE L'EVALUATION DEPUIS LA FONCTION DE JEU ------------
 eval(ETAT, E, LEVEL) :- 
-	(LEVEL = 0,eval0(ETAT, E, 0),!;
-	 LEVEL = 1,eval1(ETAT, E, 0),!;
-	 LEVEL = 2,eval4(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+	(LEVEL = 0,eval4(ETAT, E),!;
+	 LEVEL = 1,eval0(ETAT, E),!;
+	 LEVEL = 2,eval2(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 % ------------------------
 % ------------------------
 
@@ -92,6 +92,12 @@ eval1([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 % -----------------------------------------------------------------------------
 % eval0([ETAT], EVAL) : nombre de stacks contrôlés par un joueur
 % -----------------------------------------------------------------------------
+eval0(ETAT, E):-
+	(won(ETAT,0),!,E = -9999; % Si l'état est un état de victoire, c'est directement la meilleure évaluation
+	 won(ETAT,1),!,E = 9999).
+	 
+eval0(ETAT,E):-				  % Sinon, on fait l'évaluation standard
+	eval2(ETAT,E,0).
 
 eval0([], 0, 0) :- !.
 eval0([-1|R], E, _) :- 	eval0(R, E, 0), !.		% Si on trouve un -1, C <- 0
@@ -105,9 +111,18 @@ eval0([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
-% eval2([ETAT], EVAL) : 4 premiers pions + poids double pour le contrôle
+% eval2([ETAT], EVAL) : 4 premiers pions + poids QUADRUPLE pour le contrôle
+%	MEILLEUR EVAL POUR LE MOMENT !!
+% 	A FAIRE : privilégier les coups coups qui créent une tour alliée (encore plus de poids pour le contrôle ?)
 % -----------------------------------------------------------------------------
 
+eval2(ETAT,E):-
+	(won(ETAT,0),!,E = -9999; % Si l'état est un état de victoire, c'est directement la meilleure évaluation
+	 won(ETAT,1),!,E = 9999).
+	 
+eval2(ETAT,E):-				  % Sinon, on fait l'évaluation standard
+	eval2(ETAT,E,0).
+	
 eval2([], 0, 0) :- !.
 eval2([-1|R], E, _) :- 	eval2(R, E, 0), !.		% Si on trouve un -1, C <- 0
 eval2([_|R], E, 4) :-	eval2(R, E, 4), !.		% Si C = 1, vers la prochaine
@@ -127,6 +142,10 @@ eval2([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 % -----------------------------------------------------------------------------
 % eval4(+ETAT, -EVAL) : compte le nombre de coups pour chaque joueur, l'évaluation est la différence entre les coups de MAX et ceux de MIN
 % -----------------------------------------------------------------------------
+
+eval4(ETAT,E):-
+	(won(ETAT,0),!,E = -9999; % Si l'état est un état de victoire, c'est directement la meilleure évaluation
+	 won(ETAT,1),!,E = 9999).
 
 eval4(ETAT, EVAL) :- 	coups_possibles_joueur(ETAT, 1, COUPSW),
 						length(COUPSW,W),
@@ -419,7 +438,7 @@ boundedbest(ETAT,[[D,A,I]|NEXTCOUPS],LEVEL, Alpha, Beta, JOUEUR, Depth, BESTCOUP
 
 goodenough(_,[],_,_, _, _, _, COUP, Val, COUP, Val) :-!.   % On a fini la liste de coups
 
-goodenough(_,_,_,_, Alpha, Beta, JOUEUR, COUP, Val, COUP, Val) :-
+goodenough(_,_,_,_, Alpha, Beta, JOUEUR, COUP, Val, COUP, Val) :- % Cas de cut
   JOUEUR = 0, Val > Beta, !                 % MIN a dépassé la beta
   ;
   JOUEUR = 1, Val < Alpha, !.               % MAX est passé sous alpha
@@ -444,9 +463,9 @@ betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur qu
   
 betterof(_, COUP1, Val1, COUP2, Val2, RANDCOUP, RANDVAL)  :-  % COUP1 et COUP2 sont égaux : on fait en random
   Val1 = Val2, 
-  random(1,2,R),
-  (R = 1, RANDCOUP = COUP1, RANDVAL = Val1,!;
-   R = 2, RANDCOUP = COUP2, RANDVAL = Val2).
+  random(0,2,R),
+  (R = 0, RANDCOUP = COUP1, RANDVAL = Val1,!;
+   R = 1, RANDCOUP = COUP2, RANDVAL = Val2).
 
 betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
 
