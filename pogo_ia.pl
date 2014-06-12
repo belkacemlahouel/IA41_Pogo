@@ -64,8 +64,8 @@ eval_pion(0, -1).		% pion noir
 
 % --- essais
 eval(ETAT, E, LEVEL) :- 
-	(LEVEL = 0,eval2(ETAT, E),!;
-	 LEVEL = 1,eval4(ETAT, E),!;
+	(LEVEL = 0,eval4(ETAT, E),!;
+	 LEVEL = 1,eval3(ETAT, E),!;
 	 LEVEL = 2,eval2(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 % ------------------------
 % ------------------------
@@ -151,7 +151,8 @@ eval2([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
 eval3(ETAT, E) :-
 	eval4(ETAT, E4),
 	eval0(ETAT, E0),
-	E is E4 + E0*5.
+	E is E4 + E0.
+	% E is E4 + E0*5.
 
 
 
