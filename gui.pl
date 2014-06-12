@@ -166,7 +166,7 @@ won(ETAT,JOUEUR):-
 		cases(ETAT,CASES,_INDEXES),
 		won1(CASES,JOUEUR).
 		
-won1([],_).
+won1([],_):-!.
 
 won1([[J|_]|R],J):-
 		won1(R,J).

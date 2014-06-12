@@ -441,6 +441,12 @@ betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur qu
   JOUEUR = 1, Val1 > Val2, !		% rappel : pour MAX (1), on cherche la valeur la plus HAUTE !!
   ;
   JOUEUR = 0, Val1 < Val2, !.
+  
+betterof(_, COUP1, Val1, COUP2, Val2, RANDCOUP, RANDVAL)  :-  % COUP1 et COUP2 sont égaux : on fait en random
+  Val1 = Val2, 
+  random(1,2,R),
+  (R = 1, RANDCOUP = COUP1, RANDVAL = Val1,!;
+   R = 2, RANDCOUP = COUP2, RANDVAL = Val2).
 
 betterof(_, _, _, COUP2, Val2, COUP2, Val2).       % sinon COUP2 est meilleur
 
