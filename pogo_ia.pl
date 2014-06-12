@@ -422,16 +422,16 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 % minmax(+ETAT,+JOUEUR,+DEPTH,-COUP, -EVALETAT +LEVEL)
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH. On donne des profondeurs différentes en fonction du niveau du joueur.
-% EVALETAT est là en particulier pour le debug (voir si l'IA fait les bons choix)
+% EVALETAT est là en particulier pour le debug
 
 minmax(ETAT,JOUEUR,BESTCOUP,EVALETAT,LEVEL):-
 				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH);
 				LEVEL = 1,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH);
 				LEVEL = 2, DEPTH = 4, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH)).
-				 % -10000 et 10000 sont des valeurs excessivement grands pour simuler +inf et -inf
+				 % -10000 et 10000 sont des valeurs excessivement grandes pour simuler +inf et -inf
 
 % alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
-%
+% effectue un minmax avec élaga alpha-beta
 				
 alphabeta(ETAT, JOUEUR, LEVEL, Alpha, Beta, BESTCOUP, BESTEVAL, Depth) :-
 	Depth > 0,
@@ -441,23 +441,29 @@ alphabeta(ETAT, JOUEUR, LEVEL, Alpha, Beta, BESTCOUP, BESTEVAL, Depth) :-
 	LMOVES > 0,
 	!,
 	boundedbest(ETAT,L,LEVEL, Alpha, Beta, JOUEUR, OneDeeper, BESTCOUP, BESTEVAL).
-  
-alphabeta(ETAT, _,LEVEL, _, _, _, Val, 0) :-
+
+alphabeta(ETAT, _,LEVEL, _, _, _, Val, 0) :- % Profondeur atteinte, on évalue la feuille
 		eval(ETAT,Val,LEVEL),!.
 		
 alphabeta(ETAT, _,LEVEL, _, _, _, Val, _) :- % Si plus de coup avant d'avoir atteint la profondeur 0
 		eval(ETAT,Val,LEVEL).
 
+% boundedbest(+ETAT,+COUPLISTE,+LEVEL, +Alpha, +Beta, +JOUEUR, +Depth, ?BESTCOUP, ?BESTVAL)
+% la fonction boundedbest va s'occuper de faire le lien entre alphabeta (qui évalue les branches)
+% et goodenough (qui est chargée de comparer ces branches)
+		
 boundedbest(ETAT,[[D,A,I]|NEXTCOUPS],LEVEL, Alpha, Beta, JOUEUR, Depth, BESTCOUP, BESTVAL) :-
   inverser_joueur(JOUEUR, J2),
   nouvel_etat(ETAT,D,A,I,NEXTETAT),
   alphabeta(NEXTETAT, J2,LEVEL, Alpha, Beta, _BESTCOUP, Val, Depth),
   goodenough(ETAT,NEXTCOUPS,LEVEL,Depth, Alpha, Beta, JOUEUR, [D,A,I], Val, BESTCOUP, BESTVAL).
 
+% goodenough(+ETAT,+MOVELIST,+LEVEL,+Depth, +Alpha, +Beta, +JOUEUR, +COUP, Val, BESTCOUP, BESTEVAL)
+  
 goodenough(_,[],_,_, _, _, _, COUP, Val, COUP, Val) :-!.   % On a fini la liste de coups
 
 goodenough(_,_,_,_, Alpha, Beta, JOUEUR, COUP, Val, COUP, Val) :- % Cas de cut
-  JOUEUR = 0, Val > Beta, !                 % MIN a dépassé la beta
+  JOUEUR = 0, Val > Beta, !                 % MIN a dépassé beta
   ;
   JOUEUR = 1, Val < Alpha, !.               % MAX est passé sous alpha
 
