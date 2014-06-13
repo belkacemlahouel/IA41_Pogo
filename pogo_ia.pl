@@ -46,7 +46,7 @@ eval_pion(0, -1).		% pion noir (cherche à minimiser)
 eval(ETAT, E, LEVEL) :- 
 	(LEVEL = 0,eval6(ETAT, E),!; % Blancs
 	 LEVEL = 1,eval0(ETAT, E),!; % Noirs
-	 LEVEL = 2,eval5(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+	 LEVEL = 2,eval4(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 % ------------------------
 % ------------------------
 

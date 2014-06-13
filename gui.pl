@@ -28,14 +28,14 @@ main:-
 	ask_player(REP),
 	(REP = 0, 
 	write('Choisissez le niveau des blancs :\n'),
-	write('\t0.\teval4 (Variable)\n'),
+	write('\t0.\teval6 (Variable)\n'),
 	write('\t1.\teval0 (Moyen)\n'),
-	write('\t2.\teval2 (Difficile)\n'),
+	write('\t2.\teval4 (Difficile)\n'),
 	ask_level(LEVEL1),
 	write('Choisissez le niveau des noirs :\n'),
-	write('\t0.\teval4 (Variable)\n'),
+	write('\t0.\teval6 (Variable)\n'),
 	write('\t1.\teval0 (Moyen)\n'),
-	write('\t2.\teval2 (Difficile)\n'),
+	write('\t2.\teval4 (Difficile)\n'),
 	ask_level(LEVEL2),
 	play_iaonly(LEVEL1,LEVEL2),!;
 	 REP = 1, play).
@@ -69,7 +69,7 @@ play_ia(ETAT,JOUEUR,LEVEL):-
 		write('\nIA a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
 		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		inverser_joueur(JOUEUR,J1),
-		(won(NETAT,JOUEUR),!,printBoard(ETAT),write('Vous avez perdu...');
+		(won(NETAT,JOUEUR),!,printBoard(NETAT),write('Vous avez perdu...');
 		play_hmn(NETAT,J1,LEVEL)).
 
 % play_hmn(+ETAT,+JOUEUR)
@@ -93,9 +93,9 @@ play :-
 	write('\t1.\tRONDS (blancs)\n'),
 	ask_player(JOUEUR),
 	write('Choisissez le niveau de IA :\n'),
-	write('\t0.\teval4 (Variable)\n'),
+	write('\t0.\teval6 (Variable)\n'),
 	write('\t1.\teval0 (Moyen)\n'),
-	write('\t2.\teval2 (Difficile)\n'),
+	write('\t2.\teval4 (Difficile)\n'),
 	ask_level(LEVEL),
 	initial_state(E),
 	(JOUEUR = 0,play_ia(E,1,LEVEL);		% c'est toujours aux blancs de démarrer
