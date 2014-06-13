@@ -15,21 +15,10 @@
 % -----------------------------------------------------------------------------
 
 % -----------------------------------------------------------------------------
-% cJoueur est la couleur joueur
-%		1 pour le joueur blanc
-%		0 pour le joueur noir
-% -----------------------------------------------------------------------------
-
-% -----------------------------------------------------------------------------
-% lvlAI est le niveau de l'intelligence artificelle
-%		C'est normalement un nombre dans {0, 1, 2, 3}
-%		(à vérifier) où 0 => arboresence de recherche vide : hasard ?
-% -----------------------------------------------------------------------------
-
-% -----------------------------------------------------------------------------
-% nCaseDepart     numéro de la case de départ
-% nCaseArrivee    numéro de la case d'arrivée, du pion qu'on jouera
-% indexPionStack  index du pion "à la mode stack"
+% Un coup est le triplet composé comme suit :
+%	nCaseDepart     numéro de la case de départ
+%	nCaseArrivee    numéro de la case d'arrivée, du pion qu'on jouera
+%	indexPionStack  index du pion "à la mode stack"
 % -----------------------------------------------------------------------------
 
 % -----------------------------------------------------------------------------
@@ -39,7 +28,6 @@
 % 7 8 9
 % -----------------------------------------------------------------------------
 
-
 % #############################################################################
 % Creation de fonctions d'évaluations - Voir "./idees_evaluation"
 % #############################################################################
@@ -47,20 +35,12 @@
 % -----------------------------------------------------------------------------
 % Base de faits : évaluation d'un pion
 % eval_pion(Pion, Evaluation)
-eval_pion(1, 1).		% pion blanc
-eval_pion(0, -1).		% pion noir
-
-
+eval_pion(1, 1).		% pion blanc (cherche à maximiser)
+eval_pion(0, -1).		% pion noir (cherche à minimiser)
 
 
 % ------------ APPEL DE L'EVALUATION DEPUIS LA FONCTION DE JEU ------------
-% eval(ETAT, E, LEVEL) :- 
-% 	(LEVEL = 0,eval5(ETAT, E),!;
-% 	 LEVEL = 1,eval0(ETAT, E),!;
-% 	 LEVEL = 2,eval2(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
-
-
-
+% eval(+ETAT, -E, +LEVEL) :- 
 
 % --- essais
 eval(ETAT, E, LEVEL) :- 
@@ -69,11 +49,6 @@ eval(ETAT, E, LEVEL) :-
 	 LEVEL = 2,eval5(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 % ------------------------
 % ------------------------
-
-% ordre : 0 > 5 > 4
-
-
-
 
 
 % -----------------------------------------------------------------------------
@@ -246,9 +221,6 @@ nouvel_etat(E, D, A, I, E1) :-  enleve_pile(E, D, I, E0, P),
 								insere_pile(E0, P, A, E1).
 
 
-
-
-
 % -----------------------------------------------------------------------------
 % enleve_pile(+E, +D, +I, ?E0, ?P)
 % E0 est l'état E sans la pile P située sur la case D, du 1er au pion #I inclus
@@ -283,40 +255,6 @@ enleve_pile([X|E], D, I, [X|E0], P, CC, CI) :-
 			enleve_pile(E, D, I, E0, P, CC, CI), !.
 
 % ----------
-
-
-% Compteur cases
-% enleve_pile(E, D, I, E0, P) :- enleve_pile_c(E, D, I, E0, P, 1).
-
-% ----- Chercher la case
-
-% enleve_pile_c([-1|R], D, I, [-1|R0], P, CC) :- CC1 is CC+1,
-%										  enleve_pile_c(R, D, I, R0, P, CC1).
-
-% enleve_pile_c(E, D, I, E0, P, D) :- enleve_pile_i(E, D, I, E0, P, D, 1).
-
-% enleve_pile_c([X|R], D, I, [X|R0], P, CC) :-
-%										enleve_pile_c(R, D, I, R0, P, CC).
-
-% enleve_pile_c([], _, _, [], _, 10) :- !.
-% Quand le parcours est fini, on pointe sur la case après la neuvième case (?)
-
-% ----- Chercher l'index du pion
-
-% Problème si la pile est plus grande que le nombre de pions ?
-% Il ne faut pas que ce prédicat recoive des informations incohérentes !
-% Genre bouger le pion n°3 alors que la pile est de taille 1
-% Checker la couleur aussi, avant de lui demander ça
-
-% Pile ne contient que X, les autres seront ajoutés dessus, lors du retour
-% enleve_pile_i([X|R], D, I, E0, [X], CC, I) :-
-%										enleve_pile_c(R, D, I, E0, [X], CC).
-% enleve_pile_i([X|R], D, I, E0, [X|P], CC, CI) :-
-%										CI1 is CI+1,
-%										enleve_pile_i(R, D, I, E0, P, CC, CI1).
-
-% ----- Déplacer le pion et ceux qui sont au dessus
-% ----- Faut réorganiser l'ordre des priorités...
 
 
 % -----------------------------------------------
@@ -413,12 +351,14 @@ piles_joueur(ETAT,J,PILES,COUNT,INDEXES):-
 			COUNT1 is COUNT+1,
 			piles_joueur(S,J,PILES,COUNT1,INDEXES).
 			
+			
 % pile(+CASE,?INDEXPILE)
 % renvoie la liste des index du pion à la base de chaque pile possibles pour une case
 pile(C,[1,2,3]):-length(C,Y),Y >= 3,!.
 pile(C,[1,2]):-length(C,2),!.
 pile(C,[1]):-length(C,1),!.
-						
+			
+			
 % coups_pile(+PILE,+INDEX,COUPS)
 % donnes une liste de tous les coups possibles pour la pile donnée (qui correspond à la case d'index INDEX)
 
@@ -435,6 +375,7 @@ coups_pile1(P,I,[DEP,ARR,3]):-
 						member(3,P),
 						member(ARR,[1,2,3,4,5,6,7,8,9]),
 						longueur_deplacement(DEP,ARR,1).
+
 						
 % coups_possibles_joueur(+ETAT,+JOUEUR,-COUPS)
 % Retourne la liste des coups possibles pour le joueur JOUEUR
@@ -448,7 +389,8 @@ coups_possibles_joueur1([P|R1],[I|R2],COUPS):-
 						coups_pile(P,I,C1),
 						append(C1,C2,COUPS),
 						coups_possibles_joueur1(R1,R2,C2).
-					
+
+						
 % etats_pile(+ETAT,+PILE,+INDEX,-ETATS)
 % retourne tous les états ETATS possibles amenés par le mouvement des piles PILE, à partir d'un état ETAT
 
@@ -467,6 +409,7 @@ etats_pile1(ETAT,P,I,NE):-
 						member(ARR,[1,2,3,4,5,6,7,8,9]),
 						longueur_deplacement(DEP,ARR,1),
 						nouvel_etat(ETAT,DEP,ARR,3,NE).
+
 						
 % etats_possibles_joueur(+ETAT,+JOUEUR,-NETATS)
 % retourne tous les états possibles à partir d'un état (ces états sont
@@ -481,7 +424,8 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 						etats_pile(ETAT,P,I,E1),
 						append(E1,E2,NETATS),
 						etats_possibles_joueur1(ETAT,R1,R2,E2).
-				
+
+						
 % minmax(+ETAT,+JOUEUR,+DEPTH,-COUP, -EVALETAT +LEVEL)
 % minmax prend l'état actuel, ainsi que le joueur qui doit jouer, et ressort le meilleur coup que doit joueur JOUEUR
 % la profondeur de la recherche est caractérisée par DEPTH. On donne des profondeurs différentes en fonction du niveau du joueur.
@@ -493,6 +437,7 @@ minmax(ETAT,JOUEUR,BESTCOUP,EVALETAT,LEVEL):-
 				LEVEL = 2, DEPTH = 4, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH)).
 				 % -10000 et 10000 sont des valeurs excessivement grandes pour simuler +inf et -inf
 
+				 
 % alphabeta(+ETAT,+JOUEUR,+ALPHA,+BETA,?BESTCOUP,?BESTEVAL,+DEPTH)
 % effectue un minmax avec élagage alpha-beta
 % la décrémentation de la profondeur, recherche des coups possibles pour le joueur, et on
@@ -519,6 +464,7 @@ alphabeta(ETAT, _,LEVEL, _, _, _, Val1, DEPTH) :- % Si plus de coup avant d'avoi
 		Val = -9999, Val1 is Val*(DEPTH+1),!;
 		Val = Val1).
 
+		
 % boundedbest(+ETAT,+COUPLISTE,+LEVEL, +Alpha, +Beta, +JOUEUR, +Depth, ?BESTCOUP, ?BESTVAL)
 % la fonction boundedbest va s'occuper de faire le lien entre alphabeta (qui évalue les branches)
 % et goodenough (qui est chargée de comparer ces branches)
@@ -529,6 +475,7 @@ boundedbest(ETAT,[[D,A,I]|NEXTCOUPS],LEVEL, Alpha, Beta, JOUEUR, Depth, BESTCOUP
   alphabeta(NEXTETAT, J2,LEVEL, Alpha, Beta, _BESTCOUP, Val, Depth),
   goodenough(ETAT,NEXTCOUPS,LEVEL,Depth, Alpha, Beta, JOUEUR, [D,A,I], Val, BESTCOUP, BESTVAL).
 
+  
 % goodenough(+ETAT,+MOVELIST,+LEVEL,+Depth, +Alpha, +Beta, +JOUEUR, +COUP, Val, BESTCOUP, BESTEVAL)
 % goodenough est le prédicat chargé d'évaluer de comparer les évaluations qu'il reçoit avec
 % alpha et beta. C'est lui qui se charge de cut (de l'élagage)
@@ -545,6 +492,7 @@ goodenough(ETAT,MOVELIST,LEVEL,Depth, Alpha, Beta, JOUEUR, COUP, Val, BESTCOUP, 
   boundedbest(ETAT,MOVELIST,LEVEL, NewAlpha, NewBeta, JOUEUR, Depth, COUP1, Val1),
   betterof(JOUEUR, COUP, Val, COUP1, Val1, BESTCOUP, BESTEVAL).
 
+  
 % newbounds(+Alpha, +Beta, +JOUEUR, +Val, -NewAlpha, -NewBeta)
 % ce prédicat est chargé de mettre à jour Alpha ou Beta selon les conditions rencontrées
  

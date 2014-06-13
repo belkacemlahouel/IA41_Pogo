@@ -8,7 +8,6 @@ initial_state(ETAT):-
 		ETAT = [1,1,-1,1,1,-1,1,1,-1,-1,-1,-1,0,0,-1,0,0,-1,0,0,-1].
 	
 
-	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %
@@ -225,6 +224,7 @@ printBoard1([CASE|R1],[INDEX|R2],NUM):-
 		print_case_and_blanks(RCASE),
 		NUM1 is NUM+1,
 		printBoard1(R1,R2,NUM1),!.
+
 		
 % printligne(+CASE1,+CASE2,+CASE3)
 % écrite une ligne de 3 cases
@@ -236,6 +236,7 @@ print_case_and_blanks(CASE1):-
 		NBBLANKS1 is 14 - LCASE1,
 		printBlanks(NBBLANKS1),
 		write('|').
+
 		
 % writeLine()
 % La fonction writeline dessine une ligne de 14*3 tirets
@@ -246,6 +247,7 @@ writeline(Length):-
 			write(-),
 			Length2 is Length-1,
 			writeline(Length2).
+
 			
 % printCase(+CASE)
 % écrit le contenu d'une case. Blanc = O, noir = X
@@ -256,6 +258,7 @@ printCase([PION|R]):-
 		(PION = 1,write('O');
 		 PION = 0,write('X')),!,
 		 printCase(R).
+
 		 
 % printBlanks(+LENGTH)
 % écrit des espaces sur une longueur LENGTH
