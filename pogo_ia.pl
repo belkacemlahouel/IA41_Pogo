@@ -432,9 +432,9 @@ etats_possibles_joueur1(ETAT,[P|R1],[I|R2],NETATS):-
 % EVALETAT est là en particulier pour le debug
 
 minmax(ETAT,JOUEUR,BESTCOUP,EVALETAT,LEVEL):-
-				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH);
-				LEVEL = 1,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH);
-				LEVEL = 2, DEPTH = 4, alphabeta(ETAT,JOUEUR,LEVEL,-10000,10000,BESTCOUP,EVALETAT,DEPTH)).
+				(LEVEL = 0,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-100000,100000,BESTCOUP,EVALETAT,DEPTH);
+				LEVEL = 1,!, DEPTH = 3, alphabeta(ETAT,JOUEUR,LEVEL,-100000,100000,BESTCOUP,EVALETAT,DEPTH);
+				LEVEL = 2, DEPTH = 4, alphabeta(ETAT,JOUEUR,LEVEL,-100000,100000,BESTCOUP,EVALETAT,DEPTH)).
 				 % -10000 et 10000 sont des valeurs excessivement grandes pour simuler +inf et -inf
 
 				 
@@ -512,15 +512,9 @@ betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur qu
   JOUEUR = 1, Val1 > Val2, !		% rappel : pour MAX (1), on cherche la valeur la plus HAUTE !!
   ;
   JOUEUR = 0, Val1 < Val2, !.
-
-betterof(_, COUP1, Val1, COUP2, Val2, RANDCOUP, RANDVAL)  :-  % COUP1 et COUP2 sont égaux : on fait en random
-  Val1 = Val2,
-  random(0,2,R),
-  (R = 0, RANDCOUP = COUP1, RANDVAL = Val1,!;
-   R = 1, RANDCOUP = COUP2, RANDVAL = Val2).
   
 betterof(_, COUP1, Val1, COUP2, Val2, RANDCOUP, RANDVAL)  :-  % COUP1 et COUP2 sont égaux : on fait en random
-  Val1 = Val2,
+  Val1 = Val2,!,
   random(0,2,R),
   (R = 0, RANDCOUP = COUP1, RANDVAL = Val1,!;
    R = 1, RANDCOUP = COUP2, RANDVAL = Val2).
