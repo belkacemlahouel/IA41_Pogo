@@ -55,8 +55,8 @@ eval_pion(0, -1).		% pion noir
 
 % ------------ APPEL DE L'EVALUATION DEPUIS LA FONCTION DE JEU ------------
 % eval(ETAT, E, LEVEL) :- 
-% 	(LEVEL = 0,eval0(ETAT, E),!;
-% 	 LEVEL = 1,eval3(ETAT, E),!;
+% 	(LEVEL = 0,eval5(ETAT, E),!;
+% 	 LEVEL = 1,eval0(ETAT, E),!;
 % 	 LEVEL = 2,eval2(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 
 
