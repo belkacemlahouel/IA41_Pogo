@@ -121,7 +121,7 @@ play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
 		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		printBoard(NETAT),
 		inverser_joueur(JOUEUR,J1),
-		(won(NETAT,JOUEUR),!,write('Les blancs on gagne !!\n');
+		(won(NETAT,JOUEUR),!,write('Les blancs ont gagne !!\n');
 		play_iaonly(NETAT,J1,LEVEL1,LEVEL2)).
 		
 play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
@@ -132,7 +132,7 @@ play_iaonly(ETAT,JOUEUR,LEVEL1,LEVEL2):-
 		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		printBoard(NETAT),
 		inverser_joueur(JOUEUR,J1),
-		(won(NETAT,JOUEUR),!,write('Les noirs on gagne !!\n');
+		(won(NETAT,JOUEUR),!,write('Les noirs ont gagne !!\n');
 		play_iaonly(NETAT,J1,LEVEL1,LEVEL2)).
 
 % ask_player(-ID)

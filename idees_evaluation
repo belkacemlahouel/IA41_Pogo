@@ -46,3 +46,8 @@ Compter le nombre de coups pour chaque joueur
 	On tient compte d'un paramètre de mobilité de chaque joueur
 	Celui qui ne peut plus bouger perds...
 
+------------------- (5) -------------------------
+Efficacité d'un pion : à quel point mon pion (qui contrôle une tour)
+	est-il efficace ?
+	On donne une éval coefficientée (2/3...) au premier pion
+	Et une évaluation classique (*-1) à tous les pions adversaires en dessous

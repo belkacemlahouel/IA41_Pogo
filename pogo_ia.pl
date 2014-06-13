@@ -46,38 +46,46 @@
 
 % -----------------------------------------------------------------------------
 % Base de faits : évaluation d'un pion
-% evam_pion(Pion, Evaluation)
+% eval_pion(Pion, Evaluation)
 eval_pion(1, 1).		% pion blanc
 eval_pion(0, -1).		% pion noir
 
-% -----------------------------------------------------------------------------
-% eval1([ETAT], EVAL).
-% -----------------------------------------------------------------------------
 
 
-% ------------------------
-% ------------------------
-% Appel de la fonction d'évaluation en fonction du niveau...
-% eval(1, ETAT, E) :- eval1(ETAT, E, 0), !.
-% eval(0, ETAT, E) :- eval0(ETAT, E, 0), !.
-% eval(2, ETAT, E) :- eval2(ETAT, E, 0), !.
-% ... à modifier de toutes façons
-% ------------------------
-% ------------------------
 
 % ------------ APPEL DE L'EVALUATION DEPUIS LA FONCTION DE JEU ------------
+% eval(ETAT, E, LEVEL) :- 
+% 	(LEVEL = 0,eval0(ETAT, E),!;
+% 	 LEVEL = 1,eval3(ETAT, E),!;
+% 	 LEVEL = 2,eval2(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
+
+
+
+
+% --- essais
 eval(ETAT, E, LEVEL) :- 
-	(LEVEL = 0,eval4(ETAT, E),!;
-	 LEVEL = 1,eval0(ETAT, E),!;
+	(LEVEL = 0,eval0(ETAT, E),!; % Blancs
+	 LEVEL = 1,eval5(ETAT, E),!; % Noirs
 	 LEVEL = 2,eval2(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 % ------------------------
 % ------------------------
+
+
+
+
 
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
 % eval1([ETAT], EVAL) : 4 premiers pions
 % -----------------------------------------------------------------------------
+
+eval1(ETAT, E):-
+	(won(ETAT,0),!,E = -9999; % Si l'état est un état de victoire, c'est directement la meilleure évaluation
+	 won(ETAT,1),!,E = 9999).
+
+eval1(ETAT, EVAL) :- eval1(ETAT, EVAL, 0).
+
 eval1([], 0, 0) :- !.
 eval1([-1|R], E, _) :- 	eval1(R, E, 0), !.		% Si on trouve un -1, C <- 0
 eval1([_|R], E, 4) :-	eval1(R, E, 4), !.		% Si C = 4, vers la prochaine
@@ -97,7 +105,7 @@ eval0(ETAT, E):-
 	 won(ETAT,1),!,E = 9999).
 	 
 eval0(ETAT,E):-				  % Sinon, on fait l'évaluation standard
-	eval2(ETAT,E,0).
+	eval0(ETAT,E,0).
 
 eval0([], 0, 0) :- !.
 eval0([-1|R], E, _) :- 	eval0(R, E, 0), !.		% Si on trouve un -1, C <- 0
@@ -136,7 +144,24 @@ eval2([X|R], E, C) :- 	eval_pion(X, XE),	% Sinon, on evalue le pion
  						C1 is C+1,			% On incrémente le compteur
 						eval2(R, E1, C1),	% On évalue le reste
 						E is E1+XE.			% On mets à jour l'éval
-						
+
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% eval3(+ETAT, -EVAL)
+% Combinaison linéaire du nombre de tours contrôlées et du nombre de pions
+% -----------------------------------------------------------------------------
+
+eval3(ETAT, E) :-
+	eval4(ETAT, E4),
+	eval0(ETAT, E0),
+	% E is E4*3 + E0*2.	% 33
+	% E is E4 + E0.		% 32
+	E is E4 + E0*5. 	% 3
+
+
+
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
 % -----------------------------------------------------------------------------
@@ -152,6 +177,42 @@ eval4(ETAT, EVAL) :- 	coups_possibles_joueur(ETAT, 1, COUPSW),
 						coups_possibles_joueur(ETAT, 0, COUPSB),
 						length(COUPSB,B),
 						EVAL is W-B.
+
+
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% eval5(+ETAT, -EVAL) : efficacité d'un pion dans son contrôle d'une tour
+% -----------------------------------------------------------------------------
+
+eval5(ETAT, E):-
+	(won(ETAT,0),!,E = -9999; % Si l'état est un état de victoire, c'est directement la meilleure évaluation
+	won(ETAT,1),!,E = 9999).
+	 
+eval5(ETAT,E):-				  % Sinon, on fait l'évaluation standard
+	eval5(ETAT,E,-1).
+
+eval5([], 0, _) :- !.
+
+% Le troisième paramètre est la couleur du joueur qui évalue
+% -1 : pas dans une tour et on peut prendre l'éval du pion devant nous
+
+eval5([-1|ETAT], E, _) :-	eval5(ETAT, E, -1).
+
+eval5([X|ETAT], E, -1) :-	eval5(ETAT, E1, X),
+							eval_pion(X, XE),
+							E is E1 + XE.
+
+eval5([X|ETAT], E, X) :-	eval5(ETAT, E, X).
+
+eval5([X|ETAT], E, Y) :- 	eval5(ETAT, E1, Y),
+							eval_pion(X, XE),
+							E is E1 - XE.
+
+
+
+
 
 % #############################################################################
 % Fonction qui nous donne le nouvel état en fonction de ce qu'on veut jouer
