@@ -70,7 +70,7 @@ play_ia(ETAT,JOUEUR,LEVEL):-
 		write('\nIA a joué : '), write(D),write(', '),write(A),write(', '),write(I),write('\n'),
 		write('Eval etat : '),write(BESTEVAL),write('\n'),
 		inverser_joueur(JOUEUR,J1),
-		(won(NETAT,JOUEUR),!,write('Vous avez perdu...');
+		(won(NETAT,JOUEUR),!,printBoard(ETAT),write('Vous avez perdu...');
 		play_hmn(NETAT,J1,LEVEL)).
 
 % play_hmn(+ETAT,+JOUEUR)

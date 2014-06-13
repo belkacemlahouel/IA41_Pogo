@@ -64,7 +64,7 @@ eval_pion(0, -1).		% pion noir
 
 % --- essais
 eval(ETAT, E, LEVEL) :- 
-	(LEVEL = 0,eval4(ETAT, E),!; % Blancs
+	(LEVEL = 0,eval6(ETAT, E),!; % Blancs
 	 LEVEL = 1,eval0(ETAT, E),!; % Noirs
 	 LEVEL = 2,eval5(ETAT, E)). % ETAT, EVAL, COMPTEUR (4 premiers pions)
 % ------------------------
@@ -213,6 +213,24 @@ eval5([X|ETAT], E, Y) :- 	eval5(ETAT, E1, Y),
 							E is E1 - XE.
 
 
+
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% eval6(+ETAT, -EVAL) : combinaison linéaire/fonction max
+%							efficacité d'un pion dans son contrôle d'une tour
+%							nombre de coups possibles
+% -----------------------------------------------------------------------------
+
+eval6(ETAT, E):-
+	(won(ETAT,0),!,E = -9999; % Si l'état est un état de victoire, c'est directement la meilleure évaluation
+	won(ETAT,1),!,E = 9999).
+
+eval6(ETAT, E):-
+	eval5(ETAT, E5),	% Evaluation de l'efficacité d'un pion
+	eval4(ETAT, E4),	% Evaluation du nombre de coups possibles
+	eval0(ETAT, E0),	% Evaluation du nombre de tours contrôlées
+	E is E5+E4+10*E0.		% Combinaison linéaire
 
 
 

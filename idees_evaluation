@@ -51,3 +51,7 @@ Efficacité d'un pion : à quel point mon pion (qui contrôle une tour)
 	est-il efficace ?
 	On donne une éval coefficientée (2/3...) au premier pion
 	Et une évaluation classique (*-1) à tous les pions adversaires en dessous
+
+------------------- (5) -------------------------
+Somme de eval5 et eval4 et eval0
+Efficacité d'un pion, coups possibles, et nombre de tours contrôlées
