@@ -507,11 +507,17 @@ alphabeta(ETAT, JOUEUR, LEVEL, Alpha, Beta, BESTCOUP, BESTEVAL, Depth) :-
 	!,
 	boundedbest(ETAT,L,LEVEL, Alpha, Beta, JOUEUR, OneDeeper, BESTCOUP, BESTEVAL).
 
-alphabeta(ETAT, _,LEVEL, _, _, _, Val, 0) :- % Profondeur atteinte, on évalue la feuille
-		eval(ETAT,Val,LEVEL),!.
+alphabeta(ETAT, _,LEVEL, _, _, _, Val1, 0) :- % Profondeur atteinte, on évalue la feuille
+		eval(ETAT,Val,LEVEL),
+		(Val = 9999, Val1 is Val*1,!;
+		Val = -9999, Val1 is Val*1,!;
+		Val = Val1).
 		
-alphabeta(ETAT, _,LEVEL, _, _, _, Val, _) :- % Si plus de coup avant d'avoir atteint la profondeur 0
-		eval(ETAT,Val,LEVEL).
+alphabeta(ETAT, _,LEVEL, _, _, _, Val1, DEPTH) :- % Si plus de coup avant d'avoir atteint la profondeur 0
+		eval(ETAT,Val,LEVEL),
+		(Val = 9999, Val1 is Val*(DEPTH+1),!;
+		Val = -9999, Val1 is Val*(DEPTH+1),!;
+		Val = Val1).
 
 % boundedbest(+ETAT,+COUPLISTE,+LEVEL, +Alpha, +Beta, +JOUEUR, +Depth, ?BESTCOUP, ?BESTVAL)
 % la fonction boundedbest va s'occuper de faire le lien entre alphabeta (qui évalue les branches)
@@ -558,9 +564,15 @@ betterof(JOUEUR, COUP1, Val1, _, Val2, COUP1, Val1)  :-  % COUP1 est meilleur qu
   JOUEUR = 1, Val1 > Val2, !		% rappel : pour MAX (1), on cherche la valeur la plus HAUTE !!
   ;
   JOUEUR = 0, Val1 < Val2, !.
+
+betterof(_, COUP1, Val1, COUP2, Val2, RANDCOUP, RANDVAL)  :-  % COUP1 et COUP2 sont égaux : on fait en random
+  Val1 = Val2,
+  random(0,2,R),
+  (R = 0, RANDCOUP = COUP1, RANDVAL = Val1,!;
+   R = 1, RANDCOUP = COUP2, RANDVAL = Val2).
   
 betterof(_, COUP1, Val1, COUP2, Val2, RANDCOUP, RANDVAL)  :-  % COUP1 et COUP2 sont égaux : on fait en random
-  Val1 = Val2, 
+  Val1 = Val2,
   random(0,2,R),
   (R = 0, RANDCOUP = COUP1, RANDVAL = Val1,!;
    R = 1, RANDCOUP = COUP2, RANDVAL = Val2).
