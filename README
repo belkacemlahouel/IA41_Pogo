@@ -1,0 +1,7 @@
+-- POGO Game --
+
+INSTRUCTIONS FOR UNIX SYSTEMS
+1/ cd to current dir
+2/ swipl gui.pl
+3/ play! follow instructions and don't forget '.'!
+
